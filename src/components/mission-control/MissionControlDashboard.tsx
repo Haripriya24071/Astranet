@@ -15,6 +15,7 @@ import FaultInjectionModal from "./FaultInjectionModal";
 import LiveGlobeHUD from "./LiveGlobeHUD";
 import ScenarioSimulationPanel from "./ScenarioSimulationPanel";
 import MissionDataPanel from "./MissionDataPanel";
+import MissionContextPanel from "./MissionContextPanel";
 import { Search, ArrowLeft } from "lucide-react";
 
 interface MissionControlDashboardProps {
@@ -170,6 +171,7 @@ export default function MissionControlDashboard({
             "Swarm",
             "Telemetry",
             "Events",
+            "Context",
             "Simulation",
           ].map((tab) => {
             const isActive = activeNavTab === tab;
@@ -266,6 +268,8 @@ export default function MissionControlDashboard({
         <main className="flex-1 relative h-full flex flex-col bg-[#05080D] overflow-hidden">
           {activeNavTab === "Simulation" ? (
             <ScenarioSimulationPanel apiBaseUrl={apiBaseUrl} />
+          ) : activeNavTab === "Context" ? (
+            <MissionContextPanel apiBaseUrl={apiBaseUrl} />
           ) : ["Swarm", "Telemetry", "Events"].includes(activeNavTab) ? (
             <MissionDataPanel
               mode={activeNavTab as "Swarm" | "Telemetry" | "Events"}

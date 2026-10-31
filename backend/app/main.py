@@ -11,11 +11,19 @@ from typing import Set, List, Dict, Any, Optional
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, Field
+
+from backend.app.services.external_feeds import get_live_context
 
 from backend.app.core.swarm import SwarmOrchestrator
 from backend.app.schemas.telemetry import (
     TelemetryFrameSchema,
     MissionEventSchema,
+)
+from backend.app.services.external_mission_context import (
+    create_observation_task,
+    get_live_context,
+    get_observation_tasks,
 )
 from backend.app.schemas.commands import (
     StepCommand,
@@ -24,6 +32,18 @@ from backend.app.schemas.commands import (
     ResetCommand,
     ApiResponse,
 )
+
+
+class ObservationTaskRequest(BaseModel):
+    eventId: str
+    source: str
+    title: str
+    category: str
+    latitude: float = Field(..., ge=-90, le=90)
+    longitude: float = Field(..., ge=-180, le=180)
+    timestamp: Optional[str] = None
+    magnitudeLabel: Optional[str] = None
+    priority: str = "HIGH"
 
 
 # Global Swarm Orchestrator Instance (Authoritative Source of Simulation State)
@@ -271,6 +291,23 @@ def run_scenario_endpoint(scenario_id: str) -> Dict[str, Any]:
     runner = ScenarioRunner()
     result = runner.run(scen_def)
     return result.to_dict()
+
+
+
+# ============================================================================
+# REAL-WORLD EXTERNAL MISSION INTELLIGENCE
+# ============================================================================
+
+@app.get("/api/external/live-context")
+def get_external_live_context() -> Dict[str, Any]:
+    """
+    Retrieve current public mission-context data from NASA and USGS.
+
+    This endpoint does not represent telemetry from the simulated ASTRANET
+    spacecraft. It supplies environmental and disaster context that the
+    swarm may use for mission planning and visualization.
+    """
+    return get_live_context()
 
 
 # ============================================================================
