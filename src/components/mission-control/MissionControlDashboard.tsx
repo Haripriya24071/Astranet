@@ -7,7 +7,7 @@ import {
   FailureSeverity,
 } from "../../data/mockMissionControl";
 import { useSwarmTelemetry } from "../../hooks/useSwarmTelemetry";
-import CesiumGlobe from "./CesiumGlobe";
+import MissionGlobeStage, { type GlobeMode } from "./MissionGlobeStage";
 import OperationsLeftPanel from "./OperationsLeftPanel";
 import SelectedSatelliteRightPanel from "./SelectedSatelliteRightPanel";
 import MetricsBottomBar from "./MetricsBottomBar";
@@ -16,6 +16,7 @@ import LiveGlobeHUD from "./LiveGlobeHUD";
 import ScenarioSimulationPanel from "./ScenarioSimulationPanel";
 import MissionDataPanel from "./MissionDataPanel";
 import MissionContextPanel from "./MissionContextPanel";
+import IntelligencePanel from "./IntelligencePanel";
 import { Search, ArrowLeft } from "lucide-react";
 
 interface MissionControlDashboardProps {
@@ -50,6 +51,8 @@ export default function MissionControlDashboard({
   const [activeNavTab, setActiveNavTab] = useState<string>("Live Globe");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isFaultModalOpen, setIsFaultModalOpen] = useState<boolean>(false);
+  const [globeMode, setGlobeMode] = useState<GlobeMode>("SWARM");
+  const [showMissionHud, setShowMissionHud] = useState<boolean>(false);
 
   // Fallback Simulation Clock (T+ 00:14:32 counter) for standalone mode
   const [simSeconds, setSimSeconds] = useState<number>(872);
@@ -172,6 +175,7 @@ export default function MissionControlDashboard({
             "Telemetry",
             "Events",
             "Context",
+            "Intelligence",
             "Simulation",
           ].map((tab) => {
             const isActive = activeNavTab === tab;
@@ -270,6 +274,13 @@ export default function MissionControlDashboard({
             <ScenarioSimulationPanel apiBaseUrl={apiBaseUrl} />
           ) : activeNavTab === "Context" ? (
             <MissionContextPanel apiBaseUrl={apiBaseUrl} />
+          ) : activeNavTab === "Intelligence" ? (
+            <IntelligencePanel
+              apiBaseUrl={apiBaseUrl}
+              satellites={satellites}
+              selectedSatelliteId={selectedSatelliteId}
+              onSelectSatellite={setSelectedSatelliteId}
+            />
           ) : ["Swarm", "Telemetry", "Events"].includes(activeNavTab) ? (
             <MissionDataPanel
               mode={activeNavTab as "Swarm" | "Telemetry" | "Events"}
@@ -283,23 +294,41 @@ export default function MissionControlDashboard({
             />
           ) : (
             <>
-              <CesiumGlobe
+              <MissionGlobeStage
                 satellites={satellites}
                 selectedSatelliteId={selectedSatelliteId}
                 onSelectSatellite={setSelectedSatelliteId}
                 missionTime={formatMissionTime(currentMissionElapsedSec)}
                 coordinatorId={coordinatorId}
                 activeLinks={links}
+                apiBaseUrl={apiBaseUrl}
+                onModeChange={setGlobeMode}
               />
 
-              <LiveGlobeHUD
-                satellites={satellites}
-                events={events}
-                networkMetrics={networkMetrics}
-                swarmSummary={swarmSummary}
-                autonomy={autonomy}
-                isConnected={isConnected}
-              />
+              <button
+                type="button"
+                onClick={() =>
+                  setShowMissionHud(
+                    (current) => !current
+                  )
+                }
+                className="absolute top-5 right-5 z-50 rounded-lg border border-white/10 bg-[#05080D]/85 backdrop-blur-md px-3 py-2 text-[10px] tracking-[0.10em] text-[#A9BBC8] hover:text-white hover:bg-white/[0.08] transition-colors"
+              >
+                MISSION HUD
+                {" "}
+                {showMissionHud ? "▲" : "▼"}
+              </button>
+
+              {showMissionHud && (
+                <LiveGlobeHUD
+                  satellites={satellites}
+                  events={events}
+                  networkMetrics={networkMetrics}
+                  swarmSummary={swarmSummary}
+                  autonomy={autonomy}
+                  isConnected={isConnected}
+                />
+              )}
             </>
           )}
         </main>

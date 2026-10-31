@@ -270,6 +270,7 @@ from backend.app.core.scenario_runner import (
     load_scenario_from_file,
 )
 from backend.app.schemas.scenarios import ScenarioValidationError
+from backend.app.services.real_orbits import get_live_orbits
 
 
 @app.get("/api/scenarios")
@@ -372,3 +373,53 @@ async def websocket_telemetry_endpoint(websocket: WebSocket) -> None:
         await manager.disconnect(websocket)
     except Exception:
         await manager.disconnect(websocket)
+
+
+@app.get("/api/orbits/live")
+def api_live_orbits(
+    limit: int = 250,
+    max_age_hours: float = 48.0,
+    constellations: str | None = None,
+):
+    """
+    Real Orbit Shadow Mode.
+
+    Public orbital elements are propagated
+    to current UTC using SGP4.
+
+    This is orbital tracking data,
+    not spacecraft command/control telemetry.
+    """
+
+    limit = max(
+        1,
+        min(
+            limit,
+            500,
+        ),
+    )
+
+    max_age_hours = max(
+        1.0,
+        min(
+            max_age_hours,
+            168.0,
+        ),
+    )
+
+    constellation_list = None
+
+    if constellations:
+        constellation_list = [
+            item.strip()
+            for item
+            in constellations.split(",")
+            if item.strip()
+        ]
+
+    return get_live_orbits(
+        limit=limit,
+        max_age_hours=max_age_hours,
+        constellations=constellation_list,
+    )
+
