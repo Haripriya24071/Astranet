@@ -25,6 +25,12 @@ from backend.app.services.external_mission_context import (
     get_live_context,
     get_observation_tasks,
 )
+from backend.app.services.external_mission_context import (
+    create_observation_task,
+    execute_observation_task,
+    get_live_context,
+    get_observation_tasks,
+)
 from backend.app.schemas.commands import (
     StepCommand,
     WarpCommand,
