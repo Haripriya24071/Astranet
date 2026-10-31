@@ -139,12 +139,12 @@ class CapabilityGraph:
         """
         report = cls.evaluate_satellite(satellite)
 
-        # Sync boolean flags for schema compatibility
-        satellite.capabilities.sensing = (report.capabilities[CapabilityType.SENSING] != CapabilityStatus.LOST)
-        satellite.capabilities.relay = (report.capabilities[CapabilityType.RELAY] != CapabilityStatus.LOST)
-        satellite.capabilities.navigation = (report.capabilities[CapabilityType.NAVIGATION] != CapabilityStatus.LOST)
-        satellite.capabilities.compute = (report.capabilities[CapabilityType.COMPUTE] != CapabilityStatus.LOST)
-        satellite.capabilities.storage = (report.capabilities[CapabilityType.STORAGE] != CapabilityStatus.LOST)
-        satellite.capabilities.maneuvering = (report.capabilities[CapabilityType.MANEUVERING] != CapabilityStatus.LOST)
+        # Sync boolean flags for schema compatibility (only True if fully OPERATIONAL)
+        satellite.capabilities.sensing = (report.capabilities[CapabilityType.SENSING] == CapabilityStatus.OPERATIONAL)
+        satellite.capabilities.relay = (report.capabilities[CapabilityType.RELAY] == CapabilityStatus.OPERATIONAL)
+        satellite.capabilities.navigation = (report.capabilities[CapabilityType.NAVIGATION] == CapabilityStatus.OPERATIONAL)
+        satellite.capabilities.compute = (report.capabilities[CapabilityType.COMPUTE] == CapabilityStatus.OPERATIONAL)
+        satellite.capabilities.storage = (report.capabilities[CapabilityType.STORAGE] == CapabilityStatus.OPERATIONAL)
+        satellite.capabilities.maneuvering = (report.capabilities[CapabilityType.MANEUVERING] == CapabilityStatus.OPERATIONAL)
 
         return report

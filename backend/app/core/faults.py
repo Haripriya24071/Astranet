@@ -28,6 +28,9 @@ class FailureType(str, Enum):
     NODE_LOSS = "Node Loss"
     NETWORK_PARTITION = "Network Partition"
     MULTIPLE_FAILURE = "Multiple Failure"
+    STALE_STATE = "Stale State"
+    CORRUPTED_TELEMETRY = "Corrupted Telemetry"
+    BYZANTINE_BEHAVIOR = "Byzantine Behavior"
 
 
 class FailureSeverity(str, Enum):
@@ -183,6 +186,17 @@ class FaultEngine:
             satellite.network.neighbors = 0
             satellite.state = SatelliteState.FAILED
             satellite.role = SatelliteRole.ISOLATED
+
+        elif failure_type in (FailureType.STALE_STATE, FailureType.CORRUPTED_TELEMETRY, FailureType.BYZANTINE_BEHAVIOR):
+            # Byzantine / consistency anomalies degrade trust and compute status
+            satellite.subsystems.compute = status_target
+            trust_penalty = 0.65 if severity == FailureSeverity.CRITICAL else (0.40 if severity == FailureSeverity.MODERATE else 0.20)
+            satellite.trust = max(0.05, round(satellite.trust - trust_penalty, 3))
+            if satellite.trust <= 0.40:
+                satellite.state = SatelliteState.FAILED
+                satellite.role = SatelliteRole.ISOLATED
+            else:
+                satellite.state = target_state
 
         else:
             # Generic fallback degradation

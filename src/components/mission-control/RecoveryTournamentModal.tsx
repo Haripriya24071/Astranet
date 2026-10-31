@@ -55,9 +55,9 @@ export default function RecoveryTournamentModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md select-none font-sans text-xs">
-      <div className="w-full max-w-3xl bg-[#070D16] border border-cyan-500/30 rounded-xl shadow-2xl shadow-cyan-950/40 overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="w-full max-w-5xl bg-[#070D16] border border-cyan-500/30 rounded-xl shadow-2xl shadow-cyan-950/40 overflow-hidden flex flex-col max-h-[92vh]">
         {/* Header */}
-        <div className="p-4 border-b border-white/10 bg-gradient-to-r from-cyan-950/40 via-transparent to-transparent flex items-center justify-between">
+        <div className="px-5 py-3.5 border-b border-white/10 bg-gradient-to-r from-cyan-950/40 via-transparent to-transparent flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-cyan-500/15 border border-cyan-500/30 text-cyan-400">
               <Trophy className="w-5 h-5" />
@@ -85,10 +85,10 @@ export default function RecoveryTournamentModal({
         </div>
 
         {/* Modal Scrollable Body */}
-        <div className="p-5 space-y-5 overflow-y-auto">
+        <div className="p-4 space-y-4 overflow-y-auto">
           {/* Winner Showcase Banner */}
           {winner && (
-            <div className="p-4 rounded-xl border border-emerald-500/40 bg-emerald-950/20">
+            <div className="p-3.5 rounded-xl border border-emerald-500/40 bg-emerald-950/20">
               <div className="flex items-start justify-between">
                 <div>
                   <div className="flex items-center gap-2">
@@ -113,7 +113,7 @@ export default function RecoveryTournamentModal({
               </div>
 
               {/* Action list */}
-              <div className="mt-3 pt-3 border-t border-emerald-500/20 flex flex-wrap gap-2">
+              <div className="mt-2.5 pt-2.5 border-t border-emerald-500/20 flex flex-wrap gap-2">
                 {winner.actions.map((act, idx) => (
                   <span
                     key={idx}
@@ -128,10 +128,10 @@ export default function RecoveryTournamentModal({
 
           {/* Candidate Comparison Grid */}
           <div>
-            <div className="text-[11px] text-[#7F8C9A] uppercase tracking-wider font-medium mb-2.5">
+            <div className="text-[11px] text-[#7F8C9A] uppercase tracking-wider font-medium mb-2">
               Candidate Futures Evaluated ({decision.candidates.length})
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
               {decision.candidates.map((cand) => {
                 const isSelected = cand.planId === decision.selectedPlanId;
                 return (
@@ -209,16 +209,16 @@ export default function RecoveryTournamentModal({
 
           {/* Machine-Readable Rejections Breakdown */}
           {Object.keys(decision.rejectedPlansWithReasons).length > 0 && (
-            <div className="p-3.5 rounded-lg bg-black/40 border border-white/6 space-y-2">
+            <div className="p-3 rounded-lg bg-black/40 border border-white/6 space-y-2">
               <div className="text-[10px] uppercase tracking-wider text-[#7F8C9A] font-medium flex items-center gap-1.5">
                 <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
-                Why Alternative Candidates Were Rejected
+                <span>Counterfactual Rejection Provenance</span>
               </div>
-              <div className="space-y-1.5 text-[11px]">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-[10.5px]">
                 {Object.entries(decision.rejectedPlansWithReasons).map(([id, reason]) => (
-                  <div key={id} className="text-[#A0AEC0]">
-                    <span className="text-amber-300 font-mono font-medium mr-1.5">{id}:</span>
-                    {reason}
+                  <div key={id} className="p-2 rounded bg-white/[0.02] border border-white/5">
+                    <span className="text-amber-300 font-mono font-medium block mb-0.5">{id}</span>
+                    <span className="text-[#A0AEC0] leading-relaxed">{reason}</span>
                   </div>
                 ))}
               </div>

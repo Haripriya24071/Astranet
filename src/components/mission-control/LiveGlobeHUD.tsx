@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Activity,
   AlertTriangle,
@@ -58,11 +59,13 @@ export default function LiveGlobeHUD({
 
   const missionHealth =
     total > 0
-      ? clamp(
-          Math.round(((nominal + degraded * 0.6) / total) * 100),
-          0,
-          100
-        )
+      ? (degraded === 0 && failed === 0)
+        ? 100
+        : clamp(
+            Math.round(((nominal * 1.0 + degraded * 0.6) / total) * (failed > 0 ? 82 : 92)),
+            10,
+            96
+          )
       : 0;
 
   const activeRecovery = satellites.some((sat) =>
@@ -86,181 +89,165 @@ export default function LiveGlobeHUD({
     .slice(0, 4);
 
   const missionState =
-    swarmSummary?.missionState ??
-    (activeRecovery ? "RECOVERY ACTIVE" : "NOMINAL");
+    (failed > 0 || degraded > 0)
+      ? (swarmSummary?.missionState && swarmSummary.missionState !== "NOMINAL"
+          ? swarmSummary.missionState
+          : (failed >= 3 ? "SURVIVAL" : (failed > 0 ? "DEGRADED-B" : "DEGRADED-A")))
+      : (swarmSummary?.missionState ?? "NOMINAL");
 
   const coordinator =
     swarmSummary?.coordinatorId ??
     satellites.find((sat) => sat.role === "COORDINATOR")?.id ??
     "UNASSIGNED";
 
+  const [isHudMinimized, setIsHudMinimized] = useState<boolean>(false);
+
   return (
-    <div className="pointer-events-none absolute inset-0 z-20">
-      <div className="absolute left-5 top-5 w-[260px]">
-        <div className="border border-white/10 bg-[#071019]/82 backdrop-blur-md rounded-lg shadow-2xl shadow-black/20">
-          <div className="px-4 pt-3.5 pb-3 border-b border-white/[0.07]">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-[10px] tracking-[0.22em] text-[#718397] uppercase">
-                  Constellation
-                </div>
+    <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden">
+      {/* Top-Right HUD Toggle Minimizer */}
+      <div className="pointer-events-auto absolute top-4 right-4 z-30">
+        <button
+          onClick={() => setIsHudMinimized(!isHudMinimized)}
+          title={isHudMinimized ? "Expand HUD metrics" : "Minimize HUD to clear globe"}
+          className="px-2 py-1 rounded bg-[#071019]/70 hover:bg-[#071019]/90 border border-white/10 text-[10px] text-[#AAB7C4] hover:text-white transition-colors cursor-pointer flex items-center gap-1.5 backdrop-blur-md"
+        >
+          <span>{isHudMinimized ? "👁 Show HUD" : "👁 Minimize HUD"}</span>
+        </button>
+      </div>
 
-                <div className="mt-1 flex items-center gap-2">
-                  <Satellite className="w-4 h-4 text-[#B7C8D8]" />
-
-                  <span className="text-[14px] font-medium tracking-tight text-white">
+      {!isHudMinimized && (
+        <>
+          {/* TOP-LEFT: Consolidated Constellation & Mission Health Card (w-56) */}
+          <div className="pointer-events-auto absolute left-4 top-4 w-56">
+            <div className="border border-white/10 bg-[#071019]/75 backdrop-blur-md rounded-lg shadow-xl shadow-black/20 overflow-hidden">
+              {/* Header */}
+              <div className="px-3 py-2 border-b border-white/[0.07] flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <Satellite className="w-3.5 h-3.5 text-[#B7C8D8]" />
+                  <span className="text-xs font-semibold tracking-tight text-white">
                     ASTRANET-12
+                  </span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full ${
+                      isConnected ? "bg-emerald-400 animate-pulse" : "bg-red-400"
+                    }`}
+                  />
+                  <span className="text-[9px] text-[#718397] font-mono">
+                    {isConnected ? "LIVE" : "MOCK"}
                   </span>
                 </div>
               </div>
 
-              <div
-                className={`w-2 h-2 rounded-full ${
-                  isConnected ? "bg-emerald-400" : "bg-red-400"
-                }`}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-3 divide-x divide-white/[0.07]">
-            <Metric label="ACTIVE" value={`${operational}`} sub={`of ${total}`} />
-
-            <Metric
-              label="DEGRADED"
-              value={`${degraded}`}
-              warning={degraded > 0}
-            />
-
-            <Metric
-              label="FAILED"
-              value={`${failed}`}
-              critical={failed > 0}
-            />
-          </div>
-        </div>
-      </div>
-
-      <div className="absolute left-5 top-[160px] w-[260px]">
-        <div className="border border-white/10 bg-[#071019]/82 backdrop-blur-md rounded-lg px-4 py-3.5">
-          <div className="flex justify-between items-start">
-            <div>
-              <div className="text-[10px] uppercase tracking-[0.2em] text-[#718397]">
-                Mission integrity
+              {/* Counts */}
+              <div className="grid grid-cols-3 divide-x divide-white/[0.07] py-1.5 bg-black/20 text-center">
+                <div>
+                  <div className="text-[8px] text-[#718397] uppercase">Active</div>
+                  <div className="text-xs font-medium text-white">{operational}</div>
+                </div>
+                <div>
+                  <div className="text-[8px] text-[#718397] uppercase">Degraded</div>
+                  <div className={`text-xs font-medium ${degraded > 0 ? "text-amber-400" : "text-[#718397]"}`}>
+                    {degraded}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-[8px] text-[#718397] uppercase">Failed</div>
+                  <div className={`text-xs font-medium ${failed > 0 ? "text-red-400" : "text-[#718397]"}`}>
+                    {failed}
+                  </div>
+                </div>
               </div>
 
-              <div className="mt-1 text-[28px] leading-none text-white font-light tracking-tight">
-                {missionHealth}
-                <span className="text-[13px] text-[#718397] ml-1">%</span>
+              {/* Health & Mission State */}
+              <div className="px-3 py-2 space-y-1.5 border-t border-white/[0.07]">
+                <div className="flex items-center justify-between">
+                  <span className="text-[9px] uppercase tracking-wider text-[#718397]">
+                    Mission Health
+                  </span>
+                  <span className={`text-xs font-bold font-mono ${
+                    missionHealth >= 80
+                      ? "text-emerald-400"
+                      : missionHealth >= 55
+                      ? "text-amber-400"
+                      : "text-red-400"
+                  }`}>
+                    {missionHealth}%
+                  </span>
+                </div>
+                <div className="h-1 rounded-full bg-white/[0.07] overflow-hidden">
+                  <div
+                    className={`h-full transition-all duration-500 ${
+                      missionHealth >= 80
+                        ? "bg-emerald-400"
+                        : missionHealth >= 55
+                        ? "bg-amber-400"
+                        : "bg-red-400"
+                    }`}
+                    style={{ width: `${missionHealth}%` }}
+                  />
+                </div>
+                <div className="flex items-center justify-between pt-0.5">
+                  <span className="text-[9px] text-[#718397] uppercase">State</span>
+                  <span
+                    className={`text-[9px] font-bold px-1.5 py-0.5 rounded tracking-wide ${
+                      missionState === "NOMINAL"
+                        ? "bg-emerald-500/15 text-emerald-300 border border-emerald-500/30"
+                        : missionState.includes("DEGRADED")
+                        ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                        : "bg-red-500/20 text-red-300 border border-red-500/30"
+                    }`}
+                  >
+                    {missionState}
+                  </span>
+                </div>
               </div>
             </div>
-
-            <Activity
-              className={`w-4 h-4 ${
-                missionHealth >= 80
-                  ? "text-emerald-400"
-                  : missionHealth >= 55
-                  ? "text-amber-400"
-                  : "text-red-400"
-              }`}
-            />
           </div>
 
-          <div className="mt-3 h-[3px] rounded-full bg-white/[0.07] overflow-hidden">
-            <div
-              className={`h-full transition-all duration-500 ${
-                missionHealth >= 80
-                  ? "bg-emerald-400"
-                  : missionHealth >= 55
-                  ? "bg-amber-400"
-                  : "bg-red-400"
-              }`}
-              style={{ width: `${missionHealth}%` }}
-            />
-          </div>
-
-          <div className="mt-3 flex justify-between items-center">
-            <span className="text-[10px] uppercase tracking-[0.14em] text-[#718397]">
-              Mission state
-            </span>
-
-            <span
-              className={`text-[10px] font-medium tracking-[0.1em] ${
-                activeRecovery ? "text-amber-300" : "text-emerald-300"
-              }`}
-            >
-              {missionState}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div className="absolute right-5 top-5 w-[245px]">
-        <div className="border border-white/10 bg-[#071019]/82 backdrop-blur-md rounded-lg">
-          <div className="px-4 py-3 border-b border-white/[0.07] flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Network className="w-3.5 h-3.5 text-[#9FB4C8]" />
-
-              <span className="text-[10px] uppercase tracking-[0.18em] text-[#9FB4C8]">
-                Swarm network
-              </span>
+          {/* TOP-RIGHT: Compact Swarm Network Card (w-48) */}
+          <div className="pointer-events-auto absolute right-4 top-12 w-48">
+            <div className="border border-white/10 bg-[#071019]/75 backdrop-blur-md rounded-lg shadow-xl shadow-black/20 p-2.5 space-y-1.5 text-xs">
+              <div className="flex items-center justify-between border-b border-white/[0.07] pb-1.5">
+                <div className="flex items-center gap-1.5">
+                  <Network className="w-3 h-3 text-[#9FB4C8]" />
+                  <span className="text-[10px] uppercase tracking-wider text-[#9FB4C8] font-medium">
+                    RF ISL Net
+                  </span>
+                </div>
+                <span className={`text-[8px] font-bold ${networkMetrics?.connected ? "text-emerald-400" : "text-amber-400"}`}>
+                  {networkMetrics?.connected ? "CONNECTED" : "DISTRIBUTED"}
+                </span>
+              </div>
+              <div className="space-y-1 text-[10px]">
+                <div className="flex justify-between">
+                  <span className="text-[#718397]">Active Links:</span>
+                  <span className="text-white font-mono">{networkMetrics?.activeLinks ?? 0}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[#718397]">Partitions:</span>
+                  <span className={(networkMetrics?.partitionCount ?? 0) > 1 ? "text-amber-400 font-mono" : "text-white font-mono"}>
+                    {networkMetrics?.partitionCount ?? 0}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[#718397]">Avg Latency:</span>
+                  <span className="text-white font-mono">
+                    {networkMetrics ? `${networkMetrics.averageLatencyMs.toFixed(1)}ms` : "—"}
+                  </span>
+                </div>
+                <div className="flex justify-between border-t border-white/[0.05] pt-1">
+                  <span className="text-[#718397]">Coordinator:</span>
+                  <span className="text-cyan-400 font-mono font-medium">{coordinator}</span>
+                </div>
+              </div>
             </div>
-
-            <span
-              className={`text-[9px] tracking-[0.12em] ${
-                networkMetrics?.connected
-                  ? "text-emerald-400"
-                  : "text-amber-400"
-              }`}
-            >
-              {networkMetrics?.connected ? "CONNECTED" : "DISTRIBUTED"}
-            </span>
           </div>
+        </>
+      )}
 
-          <div className="px-4 py-3 space-y-2.5">
-            <DataRow
-              label="Active links"
-              value={`${networkMetrics?.activeLinks ?? 0}`}
-            />
-
-            <DataRow
-              label="Partitions"
-              value={`${networkMetrics?.partitionCount ?? 0}`}
-              warn={(networkMetrics?.partitionCount ?? 0) > 1}
-            />
-
-            <DataRow
-              label="Avg. latency"
-              value={
-                networkMetrics
-                  ? `${networkMetrics.averageLatencyMs.toFixed(2)} ms`
-                  : "—"
-              }
-            />
-
-            <DataRow label="Coordinator" value={coordinator} accent />
-          </div>
-        </div>
-      </div>
-
-      <div className="absolute top-5 left-1/2 -translate-x-1/2">
-        <div className="px-4 py-2 rounded-full border border-white/[0.09] bg-black/35 backdrop-blur-md flex items-center gap-3">
-          <Radio className="w-3.5 h-3.5 text-[#8EA6BA]" />
-
-          <span className="text-[10px] uppercase tracking-[0.22em] text-[#C3D0DC]">
-            Autonomous Swarm Digital Twin
-          </span>
-
-          <div className="h-3 w-px bg-white/10" />
-
-          <span
-            className={`text-[9px] uppercase tracking-[0.14em] ${
-              isConnected ? "text-emerald-400" : "text-red-400"
-            }`}
-          >
-            {isConnected ? "Live telemetry" : "Offline fallback"}
-          </span>
-        </div>
-      </div>
+      {/* Autonomous Recovery Active Banner */}
 
       {activeRecovery && (
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[560px] max-w-[calc(100%-40px)] pointer-events-auto">

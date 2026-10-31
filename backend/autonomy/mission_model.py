@@ -99,6 +99,14 @@ class SwarmMissionModel:
         # - SURVIVAL: Severe loss (coverage < 50% or multiple dead nodes), basic bus survival prioritized
         # - MISSION-LOST: Swarm collapsed (> 50% nodes dead or partitioned without recovery)
 
+        any_degraded = any(s.state != SatelliteState.NOMINAL for s in satellites)
+        any_impaired_caps = (
+            coverage_ratio < 1.0
+            or relay_ratio < 1.0
+            or compute_ratio < 1.0
+            or maneuver_ratio < 1.0
+        )
+
         if failed_nodes >= 6 or (coverage_ratio < 0.25 and relay_ratio < 0.25):
             mode = MissionMode.MISSION_LOST
             primary_met = False
@@ -108,7 +116,7 @@ class SwarmMissionModel:
         elif coverage_ratio < cls.COVERAGE_DEGRADED_A_MIN or relay_ratio < cls.RELAY_DEGRADED_A_MIN or failed_nodes >= 2:
             mode = MissionMode.DEGRADED_B
             primary_met = True  # Degraded but primary payload still delivered
-        elif coverage_ratio < cls.COVERAGE_NOMINAL_MIN or relay_ratio < cls.RELAY_NOMINAL_MIN or maneuver_ratio < 1.0 or failed_nodes == 1:
+        elif any_impaired_caps or any_degraded or failed_nodes >= 1:
             mode = MissionMode.DEGRADED_A
             primary_met = True
         else:

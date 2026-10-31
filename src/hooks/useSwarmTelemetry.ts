@@ -192,10 +192,20 @@ export function useSwarmTelemetry(): UseSwarmTelemetryReturn {
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
+          let errorMsg = `HTTP ${response.status}: Failed to inject fault`;
+          if (Array.isArray(errorData.detail)) {
+            errorMsg = errorData.detail
+              .map((d: any) => d.msg || (typeof d === "string" ? d : JSON.stringify(d)))
+              .join("; ");
+          } else if (typeof errorData.detail === "string") {
+            errorMsg = errorData.detail;
+          } else if (errorData.detail && typeof errorData.detail === "object") {
+            errorMsg = JSON.stringify(errorData.detail);
+          }
           return {
             ok: false,
             success: false,
-            error: errorData.detail || `HTTP ${response.status}: Failed to inject fault`,
+            error: errorMsg,
           };
         }
 

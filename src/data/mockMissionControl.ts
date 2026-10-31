@@ -181,6 +181,7 @@ export type FailureType =
   | "Propulsion Failure"
   | "Navigation Failure"
   | "Power Degradation"
+  | "Compute Failure"
   | "Network Partition"
   | "Stale State"
   | "Corrupted Telemetry"
@@ -795,11 +796,12 @@ export const INITIAL_EVENTS: MissionEvent[] = [
 
 // Available failure injection options
 export const FAILURE_TYPES: FailureType[] = [
-  "Node Loss",
   "Communication Failure",
   "Propulsion Failure",
-  "Navigation Failure",
   "Power Degradation",
+  "Compute Failure",
+  "Navigation Failure",
+  "Node Loss",
   "Network Partition",
   "Stale State",
   "Corrupted Telemetry",
