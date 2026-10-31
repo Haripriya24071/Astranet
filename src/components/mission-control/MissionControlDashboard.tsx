@@ -12,6 +12,7 @@ import OperationsLeftPanel from "./OperationsLeftPanel";
 import SelectedSatelliteRightPanel from "./SelectedSatelliteRightPanel";
 import MetricsBottomBar from "./MetricsBottomBar";
 import FaultInjectionModal from "./FaultInjectionModal";
+import LiveGlobeHUD from "./LiveGlobeHUD";
 import { Search, ArrowLeft } from "lucide-react";
 
 interface MissionControlDashboardProps {
@@ -266,6 +267,14 @@ export default function MissionControlDashboard({
             missionTime={formatMissionTime(currentMissionElapsedSec)}
             coordinatorId={coordinatorId}
             activeLinks={links}
+          />
+
+          <LiveGlobeHUD
+            satellites={satellites}
+            events={events}
+            networkMetrics={networkMetrics}
+            swarmSummary={swarmSummary}
+            isConnected={isConnected}
           />
         </main>
 

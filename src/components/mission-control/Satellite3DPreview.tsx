@@ -663,7 +663,12 @@ export default function Satellite3DPreview({
       });
 
       selectionHelper.geometry.dispose();
-      selectionHelper.material.dispose();
+
+      if (Array.isArray(selectionHelper.material)) {
+        selectionHelper.material.forEach((material) => material.dispose());
+      } else {
+        selectionHelper.material.dispose();
+      }
 
       renderer.dispose();
 

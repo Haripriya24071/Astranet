@@ -16,7 +16,7 @@ export default function MetricsBottomBar({
     ? swarmSummary.degraded
     : satellites.filter((s) => s.state === "DEGRADED" || s.state === "WARNING" || s.state === "SUSPECTED").length;
   const failedCount = swarmSummary
-    ? swarmSummary.failed + (swarmSummary.isolated || 0)
+    ? swarmSummary.failed
     : satellites.filter((s) => s.state === "FAILED" || s.state === "ISOLATED").length;
   const totalCount = swarmSummary ? swarmSummary.total : satellites.length;
 

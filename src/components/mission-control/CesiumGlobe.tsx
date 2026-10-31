@@ -258,8 +258,8 @@ export default function CesiumGlobe({
         scene.highDynamicRange = true;
         scene.fog.enabled = true;
         scene.fog.density = 0.0002;
-        scene.sun.show = true;
-        scene.moon.show = false;
+        if (scene.sun) scene.sun.show = true;
+        if (scene.moon) scene.moon.show = false;
 
         if (scene.skyAtmosphere) {
           scene.skyAtmosphere.show = true;
