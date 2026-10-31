@@ -14,7 +14,7 @@ import MetricsBottomBar from "./MetricsBottomBar";
 import FaultInjectionModal from "./FaultInjectionModal";
 import LiveGlobeHUD from "./LiveGlobeHUD";
 import ScenarioSimulationPanel from "./ScenarioSimulationPanel";
-import { useExternalMissionContext } from "../../hooks/useExternalMissionContext";
+import MissionDataPanel from "./MissionDataPanel";
 import { Search, ArrowLeft } from "lucide-react";
 
 interface MissionControlDashboardProps {
@@ -77,8 +77,6 @@ export default function MissionControlDashboard({
       "0"
     )}:${String(secs).padStart(2, "0")}`;
   };
-
-  const externalContext = useExternalMissionContext(60000);
 
   const selectedSatellite =
     satellites.find((s) => s.id === selectedSatelliteId) ||
@@ -268,6 +266,17 @@ export default function MissionControlDashboard({
         <main className="flex-1 relative h-full flex flex-col bg-[#05080D] overflow-hidden">
           {activeNavTab === "Simulation" ? (
             <ScenarioSimulationPanel apiBaseUrl={apiBaseUrl} />
+          ) : ["Swarm", "Telemetry", "Events"].includes(activeNavTab) ? (
+            <MissionDataPanel
+              mode={activeNavTab as "Swarm" | "Telemetry" | "Events"}
+              satellites={satellites}
+              events={events}
+              networkMetrics={networkMetrics}
+              swarmSummary={swarmSummary}
+              autonomy={autonomy}
+              selectedSatelliteId={selectedSatelliteId}
+              onSelectSatellite={setSelectedSatelliteId}
+            />
           ) : (
             <>
               <CesiumGlobe
