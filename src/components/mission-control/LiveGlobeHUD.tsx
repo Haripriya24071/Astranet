@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 
 import type {
+  AutonomySummary,
   MissionEvent,
   NetworkSummary,
   SatelliteTelemetry,
@@ -19,6 +20,7 @@ interface LiveGlobeHUDProps {
   events: MissionEvent[];
   networkMetrics: NetworkSummary | null;
   swarmSummary: SwarmSummary | null;
+  autonomy: AutonomySummary | null;
   isConnected: boolean;
 }
 
@@ -31,6 +33,7 @@ export default function LiveGlobeHUD({
   events,
   networkMetrics,
   swarmSummary,
+  autonomy,
   isConnected,
 }: LiveGlobeHUDProps) {
   const total = swarmSummary?.total ?? satellites.length;
@@ -62,16 +65,20 @@ export default function LiveGlobeHUD({
         )
       : 0;
 
-  const activeRecovery = satellites.some((sat) =>
-    [
-      "WARNING",
-      "SUSPECTED",
-      "DEGRADED",
-      "FAILED",
-      "ISOLATED",
-      "RECOVERING",
-    ].includes(sat.state)
-  );
+  const activeTask = autonomy?.activeTasks?.[0] ?? null;
+
+  const activeRecovery =
+    (autonomy?.activeTaskCount ?? 0) > 0 ||
+    satellites.some((sat) =>
+      [
+        "WARNING",
+        "SUSPECTED",
+        "DEGRADED",
+        "FAILED",
+        "ISOLATED",
+        "RECOVERING",
+      ].includes(sat.state)
+    );
 
   const recoveryEvents = events
     .filter(
@@ -286,32 +293,61 @@ export default function LiveGlobeHUD({
             </div>
 
             <div className="grid grid-cols-4 divide-x divide-white/[0.06]">
-              {["DETECT", "VERIFY", "RECONFIGURE", "STABILIZE"].map(
-                (stage, index) => {
-                  const completedStages = failed > 0 || degraded > 0 ? 2 : 0;
+              <RecoveryMetric
+                label="NODE"
+                value={activeTask?.satelliteId ?? "—"}
+              />
 
-                  return (
-                    <div key={stage} className="px-3 py-3">
-                      <div className="flex items-center gap-2">
-                        <div
-                          className={`w-1.5 h-1.5 rounded-full ${
-                            index < completedStages
-                              ? "bg-emerald-400"
-                              : index === completedStages
-                              ? "bg-amber-400 animate-pulse"
-                              : "bg-white/20"
-                          }`}
-                        />
+              <RecoveryMetric
+                label="ACTION"
+                value={activeTask?.actionType ?? "CONTAINMENT"}
+              />
 
-                        <span className="text-[9px] tracking-[0.15em] text-[#AAB7C4]">
-                          {stage}
-                        </span>
-                      </div>
-                    </div>
-                  );
+              <RecoveryMetric
+                label="PROGRESS"
+                value={
+                  activeTask
+                    ? `${activeTask.progressPct.toFixed(0)}%`
+                    : "—"
                 }
-              )}
+                active={Boolean(activeTask)}
+              />
+
+              <RecoveryMetric
+                label="REMAINING"
+                value={
+                  activeTask
+                    ? `${activeTask.remainingSec.toFixed(1)}s`
+                    : "—"
+                }
+              />
             </div>
+
+            {activeTask && (
+              <div className="px-4 py-2 border-t border-white/[0.05] bg-amber-400/[0.025]">
+                <div className="h-1 rounded-full bg-white/[0.06] overflow-hidden">
+                  <div
+                    className="h-full bg-amber-400 transition-all duration-200"
+                    style={{
+                      width: `${Math.min(
+                        100,
+                        Math.max(0, activeTask.progressPct)
+                      )}%`,
+                    }}
+                  />
+                </div>
+
+                <div className="mt-1.5 flex justify-between text-[9px] text-[#718397]">
+                  <span>
+                    {activeTask.failureType}
+                  </span>
+
+                  <span>
+                    {activeTask.phase}
+                  </span>
+                </div>
+              </div>
+            )}
 
             {recoveryEvents.length > 0 && (
               <div className="px-4 py-2.5 bg-white/[0.025] border-t border-white/[0.05]">
@@ -321,7 +357,7 @@ export default function LiveGlobeHUD({
                   </span>
 
                   <span className="text-[10px] text-[#AAB7C4] leading-relaxed">
-                    {recoveryEvents[0].message}
+                    {autonomy?.latestDecision || recoveryEvents[0].message}
                   </span>
                 </div>
               </div>
@@ -329,6 +365,34 @@ export default function LiveGlobeHUD({
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+
+function RecoveryMetric({
+  label,
+  value,
+  active = false,
+}: {
+  label: string;
+  value: string;
+  active?: boolean;
+}) {
+  return (
+    <div className="px-3 py-3 min-w-0">
+      <div className="text-[8px] tracking-[0.14em] text-[#687887]">
+        {label}
+      </div>
+
+      <div
+        className={`mt-1 text-[10px] font-medium truncate ${
+          active ? "text-amber-300" : "text-[#D5DEE6]"
+        }`}
+        title={value}
+      >
+        {value}
+      </div>
     </div>
   );
 }

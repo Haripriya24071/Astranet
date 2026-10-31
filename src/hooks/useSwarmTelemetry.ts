@@ -13,6 +13,7 @@ import {
   NetworkSummary,
   SwarmClock,
   SwarmSummary,
+  AutonomySummary,
   TelemetryFrame,
   FailureType,
   FailureSeverity,
@@ -27,6 +28,7 @@ export interface UseSwarmTelemetryReturn {
   networkMetrics: NetworkSummary | null;
   clock: SwarmClock | null;
   swarmSummary: SwarmSummary | null;
+  autonomy: AutonomySummary | null;
   isConnected: boolean;
   isReconnecting: boolean;
   isPaused: boolean;
@@ -58,6 +60,7 @@ export function useSwarmTelemetry(): UseSwarmTelemetryReturn {
   const [networkMetrics, setNetworkMetrics] = useState<NetworkSummary | null>(null);
   const [clock, setClock] = useState<SwarmClock | null>(null);
   const [swarmSummary, setSwarmSummary] = useState<SwarmSummary | null>(null);
+  const [autonomy, setAutonomy] = useState<AutonomySummary | null>(null);
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isReconnecting, setIsReconnecting] = useState<boolean>(false);
   const [isPaused, setIsPaused] = useState<boolean>(false);
@@ -108,6 +111,9 @@ export function useSwarmTelemetry(): UseSwarmTelemetryReturn {
             }
             if (frame.swarmSummary) {
               setSwarmSummary(frame.swarmSummary);
+            }
+            if (frame.autonomy) {
+              setAutonomy(frame.autonomy);
             }
             setClock(frame.clock);
             setIsPaused(Boolean(frame.clock.isPaused));
@@ -286,6 +292,7 @@ export function useSwarmTelemetry(): UseSwarmTelemetryReturn {
     networkMetrics,
     clock,
     swarmSummary,
+    autonomy,
     isConnected,
     isReconnecting,
     isPaused,

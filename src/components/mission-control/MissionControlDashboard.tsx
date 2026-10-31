@@ -13,6 +13,7 @@ import SelectedSatelliteRightPanel from "./SelectedSatelliteRightPanel";
 import MetricsBottomBar from "./MetricsBottomBar";
 import FaultInjectionModal from "./FaultInjectionModal";
 import LiveGlobeHUD from "./LiveGlobeHUD";
+import { useExternalMissionContext } from "../../hooks/useExternalMissionContext";
 import { Search, ArrowLeft } from "lucide-react";
 
 interface MissionControlDashboardProps {
@@ -29,6 +30,7 @@ export default function MissionControlDashboard({
     networkMetrics,
     clock,
     swarmSummary,
+    autonomy,
     links,
     isConnected,
     isReconnecting,
@@ -73,6 +75,8 @@ export default function MissionControlDashboard({
       "0"
     )}:${String(secs).padStart(2, "0")}`;
   };
+
+  const externalContext = useExternalMissionContext(60000);
 
   const selectedSatellite =
     satellites.find((s) => s.id === selectedSatelliteId) ||
@@ -274,6 +278,7 @@ export default function MissionControlDashboard({
             events={events}
             networkMetrics={networkMetrics}
             swarmSummary={swarmSummary}
+            autonomy={autonomy}
             isConnected={isConnected}
           />
         </main>

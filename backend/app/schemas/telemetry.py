@@ -129,6 +129,29 @@ class SwarmSummarySchema(BaseModel):
     missionState: str
 
 
+class RecoveryTaskTelemetrySchema(BaseModel):
+    """Live autonomous recovery task state."""
+    taskId: str
+    satelliteId: str
+    failureType: str
+    severity: str
+    phase: str
+    actionType: str
+    progressPct: float = Field(..., ge=0.0, le=100.0)
+    remainingSec: float = Field(..., ge=0.0)
+    details: Dict[str, Any] = Field(default_factory=dict)
+
+
+class AutonomySummarySchema(BaseModel):
+    """Swarm autonomy and self-healing engine state."""
+    engineStatus: str
+    activeTaskCount: int = Field(..., ge=0)
+    leadershipUnresolved: bool
+    lastKnownCoordinatorId: Optional[str] = None
+    latestDecision: str
+    activeTasks: List[RecoveryTaskTelemetrySchema]
+
+
 class TelemetryFrameSchema(BaseModel):
     """Complete consolidated telemetry frame broadcast by the simulation backend."""
     clock: ClockTelemetry
@@ -136,4 +159,5 @@ class TelemetryFrameSchema(BaseModel):
     links: List[Tuple[str, str]]
     network: NetworkSummarySchema
     events: List[MissionEventSchema]
+    autonomy: AutonomySummarySchema
     swarmSummary: SwarmSummarySchema
