@@ -13,6 +13,7 @@ import {
   NetworkSummary,
   SwarmClock,
   SwarmSummary,
+  AutonomySummary,
   TelemetryFrame,
   RecoveryDecision,
   FailureType,
@@ -29,6 +30,7 @@ export interface UseSwarmTelemetryReturn {
   clock: SwarmClock | null;
   swarmSummary: SwarmSummary | null;
   latestDecision: RecoveryDecision | null;
+  autonomy: AutonomySummary | null;
   isConnected: boolean;
   isReconnecting: boolean;
   isPaused: boolean;
@@ -62,6 +64,7 @@ export function useSwarmTelemetry(): UseSwarmTelemetryReturn {
   const [clock, setClock] = useState<SwarmClock | null>(null);
   const [swarmSummary, setSwarmSummary] = useState<SwarmSummary | null>(null);
   const [latestDecision, setLatestDecision] = useState<RecoveryDecision | null>(null);
+  const [autonomy, setAutonomy] = useState<AutonomySummary | null>(null);
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isReconnecting, setIsReconnecting] = useState<boolean>(false);
   const [isPaused, setIsPaused] = useState<boolean>(false);
@@ -115,6 +118,9 @@ export function useSwarmTelemetry(): UseSwarmTelemetryReturn {
             }
             if (frame.latestDecision) {
               setLatestDecision(frame.latestDecision);
+            }
+            if (frame.autonomy) {
+              setAutonomy(frame.autonomy);
             }
             setClock(frame.clock);
             setIsPaused(Boolean(frame.clock.isPaused));
@@ -319,6 +325,7 @@ export function useSwarmTelemetry(): UseSwarmTelemetryReturn {
     clock,
     swarmSummary,
     latestDecision,
+    autonomy,
     isConnected,
     isReconnecting,
     isPaused,
