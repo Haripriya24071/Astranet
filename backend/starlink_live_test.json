@@ -1,0 +1,1 @@
+{"@context":"https:\/\/www.w3.org\/ns\/hydra\/context.jsonld","@id":"https:\/\/tle.ivanstanojevic.me\/api\/tle\/69981","@type":"Tle","satelliteId":69981,"name":"STARLINK-38050","date":"2026-10-30T18:00:02+00:00","line1":"1 69981U 26159G   26303.75002315 -.00033309  00000+0 -10336-2 0  9997","line2":"2 69981  97.2842 144.9986 0001717  88.6323 344.8811 15.33455129  5848"}

@@ -11,11 +11,19 @@ from typing import Set, List, Dict, Any, Optional
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, Field
+
 
 from backend.app.core.swarm import SwarmOrchestrator
 from backend.app.schemas.telemetry import (
     TelemetryFrameSchema,
     MissionEventSchema,
+)
+from backend.app.services.external_mission_context import (
+    create_observation_task,
+    execute_observation_task,
+    get_live_context,
+    get_observation_tasks,
 )
 from backend.app.schemas.commands import (
     StepCommand,
@@ -24,6 +32,18 @@ from backend.app.schemas.commands import (
     ResetCommand,
     ApiResponse,
 )
+
+
+class ObservationTaskRequest(BaseModel):
+    eventId: str
+    source: str
+    title: str
+    category: str
+    latitude: float = Field(..., ge=-90, le=90)
+    longitude: float = Field(..., ge=-180, le=180)
+    timestamp: Optional[str] = None
+    magnitudeLabel: Optional[str] = None
+    priority: str = "HIGH"
 
 
 # Global Swarm Orchestrator Instance (Authoritative Source of Simulation State)
@@ -286,6 +306,7 @@ from backend.app.core.scenario_runner import (
     load_scenario_from_file,
 )
 from backend.app.schemas.scenarios import ScenarioValidationError
+from backend.app.services.real_orbits import get_live_orbits
 
 
 @app.get("/api/scenarios")
@@ -309,6 +330,64 @@ def run_scenario_endpoint(scenario_id: str) -> Dict[str, Any]:
     return result.to_dict()
 
 
+
+# ============================================================================
+# REAL-WORLD EXTERNAL MISSION INTELLIGENCE
+# ============================================================================
+
+@app.get("/api/external/live-context")
+def get_external_live_context() -> Dict[str, Any]:
+    """Retrieve current NASA EONET and USGS mission-context data."""
+    return get_live_context()
+
+
+@app.post("/api/mission/observation-task")
+def plan_observation_task(
+    cmd: ObservationTaskRequest,
+) -> Dict[str, Any]:
+    """Plan a simulated observation mission from a real-world event."""
+    try:
+        return create_observation_task(
+            orchestrator,
+            cmd.model_dump(),
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(exc),
+        )
+
+
+@app.post("/api/mission/observation-task/{task_id}/execute")
+def execute_planned_observation(
+    task_id: str,
+) -> Dict[str, Any]:
+    """Execute a planned digital-twin Earth-observation task."""
+    try:
+        return execute_observation_task(
+            orchestrator,
+            task_id,
+        )
+    except KeyError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(exc),
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(exc),
+        )
+
+
+@app.get("/api/mission/observation-tasks")
+def list_observation_tasks() -> List[Dict[str, Any]]:
+    """Return current simulated observation-task lifecycle states."""
+    return get_observation_tasks(
+        orchestrator
+    )
+
+
 # ============================================================================
 # WEBSOCKET STREAMING ENDPOINT
 # ============================================================================
@@ -330,3 +409,53 @@ async def websocket_telemetry_endpoint(websocket: WebSocket) -> None:
         await manager.disconnect(websocket)
     except Exception:
         await manager.disconnect(websocket)
+
+
+@app.get("/api/orbits/live")
+def api_live_orbits(
+    limit: int = 250,
+    max_age_hours: float = 48.0,
+    constellations: str | None = None,
+):
+    """
+    Real Orbit Shadow Mode.
+
+    Public orbital elements are propagated
+    to current UTC using SGP4.
+
+    This is orbital tracking data,
+    not spacecraft command/control telemetry.
+    """
+
+    limit = max(
+        1,
+        min(
+            limit,
+            500,
+        ),
+    )
+
+    max_age_hours = max(
+        1.0,
+        min(
+            max_age_hours,
+            168.0,
+        ),
+    )
+
+    constellation_list = None
+
+    if constellations:
+        constellation_list = [
+            item.strip()
+            for item
+            in constellations.split(",")
+            if item.strip()
+        ]
+
+    return get_live_orbits(
+        limit=limit,
+        max_age_hours=max_age_hours,
+        constellations=constellation_list,
+    )
+

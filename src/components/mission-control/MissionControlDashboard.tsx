@@ -13,16 +13,12 @@ import SelectedSatelliteRightPanel from "./SelectedSatelliteRightPanel";
 import MetricsBottomBar from "./MetricsBottomBar";
 import FaultInjectionModal from "./FaultInjectionModal";
 import LiveGlobeHUD from "./LiveGlobeHUD";
-<<<<<<< HEAD
 import RecoveryTournamentModal from "./RecoveryTournamentModal";
-import { Search, ArrowLeft, Trophy } from "lucide-react";
-=======
 import ScenarioSimulationPanel from "./ScenarioSimulationPanel";
 import MissionDataPanel from "./MissionDataPanel";
 import MissionContextPanel from "./MissionContextPanel";
 import IntelligencePanel from "./IntelligencePanel";
-import { Search, ArrowLeft } from "lucide-react";
->>>>>>> origin/vaibhavi
+import { Search, ArrowLeft, Trophy } from "lucide-react";
 
 interface MissionControlDashboardProps {
   onExit: () => void;
@@ -38,12 +34,9 @@ export default function MissionControlDashboard({
     networkMetrics,
     clock,
     swarmSummary,
-<<<<<<< HEAD
     latestDecision,
-=======
     autonomy,
     apiBaseUrl,
->>>>>>> origin/vaibhavi
     links,
     isConnected,
     isReconnecting,
@@ -61,12 +54,9 @@ export default function MissionControlDashboard({
   const [activeNavTab, setActiveNavTab] = useState<string>("Live Globe");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isFaultModalOpen, setIsFaultModalOpen] = useState<boolean>(false);
-<<<<<<< HEAD
   const [isTournamentModalOpen, setIsTournamentModalOpen] = useState<boolean>(false);
-=======
   const [globeMode, setGlobeMode] = useState<GlobeMode>("SWARM");
   const [showMissionHud, setShowMissionHud] = useState<boolean>(false);
->>>>>>> origin/vaibhavi
 
   // Fallback Simulation Clock (T+ 00:14:32 counter) for standalone mode
   const [simSeconds, setSimSeconds] = useState<number>(872);
@@ -334,16 +324,6 @@ export default function MissionControlDashboard({
                 onModeChange={setGlobeMode}
               />
 
-<<<<<<< HEAD
-          <LiveGlobeHUD
-            satellites={satellites}
-            events={events}
-            networkMetrics={networkMetrics}
-            swarmSummary={swarmSummary}
-            isConnected={isConnected}
-            onOpenTournament={() => setIsTournamentModalOpen(true)}
-          />
-=======
               <button
                 type="button"
                 onClick={() =>
@@ -353,8 +333,7 @@ export default function MissionControlDashboard({
                 }
                 className="absolute top-5 right-5 z-50 rounded-lg border border-white/10 bg-[#05080D]/85 backdrop-blur-md px-3 py-2 text-[10px] tracking-[0.10em] text-[#A9BBC8] hover:text-white hover:bg-white/[0.08] transition-colors"
               >
-                MISSION HUD
-                {" "}
+                MISSION HUD{" "}
                 {showMissionHud ? "▲" : "▼"}
               </button>
 
@@ -366,11 +345,11 @@ export default function MissionControlDashboard({
                   swarmSummary={swarmSummary}
                   autonomy={autonomy}
                   isConnected={isConnected}
+                  onOpenTournament={() => setIsTournamentModalOpen(true)}
                 />
               )}
             </>
           )}
->>>>>>> origin/vaibhavi
         </main>
 
         {/* CLEAN RIGHT SELECTED SATELLITE PANEL (320px) */}

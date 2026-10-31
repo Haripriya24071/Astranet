@@ -122,12 +122,38 @@ export interface RecoveryDecision {
   missionStateAfter: string;
 }
 
+export interface RecoveryTaskTelemetry {
+  taskId: string;
+  satelliteId: string;
+  failureType: string;
+  severity: string;
+  phase: string;
+  actionType: string;
+  progressPct: number;
+  remainingSec: number;
+  details: Record<string, unknown>;
+}
+
+export interface AutonomySummary {
+  engineStatus:
+    | "MONITORING"
+    | "RECOVERING"
+    | "LEADERSHIP_UNRESOLVED"
+    | string;
+  activeTaskCount: number;
+  leadershipUnresolved: boolean;
+  lastKnownCoordinatorId?: string | null;
+  latestDecision: string;
+  activeTasks: RecoveryTaskTelemetry[];
+}
+
 export interface TelemetryFrame {
   clock: SwarmClock;
   satellites: SatelliteTelemetry[];
   links: Array<[string, string]>;
   network: NetworkSummary;
   events: MissionEvent[];
+  autonomy?: AutonomySummary;
   swarmSummary: SwarmSummary;
   latestDecision?: RecoveryDecision;
 }

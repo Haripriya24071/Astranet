@@ -362,6 +362,60 @@ class SwarmOrchestrator:
         )
 
         all_events = self.events
+
+        # Live autonomous recovery telemetry for Mission Control.
+        active_recovery_tasks = []
+
+        for task in self.recovery_engine.active_tasks.values():
+            duration = max(float(task.duration_sec), 0.001)
+
+            elapsed = max(
+                0.0,
+                self.clock.elapsed_seconds - task.start_sim_time,
+            )
+
+            progress_pct = min(
+                100.0,
+                max(0.0, (elapsed / duration) * 100.0),
+            )
+
+            remaining_sec = max(
+                0.0,
+                task.target_completion_sim_time
+                - self.clock.elapsed_seconds,
+            )
+
+            active_recovery_tasks.append({
+                "taskId": task.task_id,
+                "satelliteId": task.satellite_id,
+                "failureType": task.failure_type.value,
+                "severity": task.severity.value,
+                "phase": task.phase.value,
+                "actionType": task.action_type,
+                "progressPct": round(progress_pct, 1),
+                "remainingSec": round(remaining_sec, 2),
+                "details": task.details,
+            })
+
+        recovery_events = [
+            ev
+            for ev in all_events
+            if getattr(ev, "type", None) == "RECOVERY"
+        ]
+
+        latest_decision = (
+            recovery_events[-1].message
+            if recovery_events
+            else "Autonomy engine monitoring swarm health"
+        )
+
+        if self.recovery_engine.is_leadership_unresolved:
+            autonomy_engine_status = "LEADERSHIP_UNRESOLVED"
+        elif active_recovery_tasks:
+            autonomy_engine_status = "RECOVERING"
+        else:
+            autonomy_engine_status = "MONITORING"
+
         return {
             "clock": self.clock.to_dict(),
             "satellites": [sat.to_dict() for sat in self._satellites_list],
@@ -369,6 +423,14 @@ class SwarmOrchestrator:
             "network": self.network.to_dict(),
             "events": [ev.to_dict() for ev in reversed(all_events[-10:])],
             "latestDecision": self._latest_decision.to_dict() if self._latest_decision else None,
+            "autonomy": {
+                "engineStatus": autonomy_engine_status,
+                "activeTaskCount": len(active_recovery_tasks),
+                "leadershipUnresolved": self.recovery_engine.is_leadership_unresolved,
+                "lastKnownCoordinatorId": self.recovery_engine.last_known_coordinator_id,
+                "latestDecision": latest_decision,
+                "activeTasks": active_recovery_tasks,
+            },
             "swarmSummary": {
                 "total": self.satellite_count,
                 "nominal": nominal_count,
