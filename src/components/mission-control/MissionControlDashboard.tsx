@@ -70,6 +70,8 @@ export default function MissionControlDashboard({
   const [showMissionHud, setShowMissionHud] = useState<boolean>(false);
   const [previewGhostCandidate, setPreviewGhostCandidate] = useState<RecoveryCandidate | null>(null);
   const [blastRadiusData, setBlastRadiusData] = useState<BlastRadiusResult | null>(null);
+  const [simSeconds, setSimSeconds] = useState<number>(872);
+  const [utcTime, setUtcTime] = useState<string>("");
 
   const handleSimulateBlastRadius = async (satelliteId: string) => {
     try {
@@ -82,10 +84,6 @@ export default function MissionControlDashboard({
       console.warn("ASTRANET: Failed to simulate blast radius", err);
     }
   };
-
-  // Fallback Simulation Clock (T+ 00:14:32 counter) for standalone mode
-  const [simSeconds, setSimSeconds] = useState<number>(872);
-  const [utcTime, setUtcTime] = useState<string>("");
 
   useEffect(() => {
     const timer = setInterval(() => {

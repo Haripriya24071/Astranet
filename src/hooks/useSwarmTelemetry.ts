@@ -79,13 +79,12 @@ export function useSwarmTelemetry(): UseSwarmTelemetryReturn {
   const [isReconnecting, setIsReconnecting] = useState<boolean>(false);
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Mission Black Box Ring Buffer
-  const historyBufferRef = useRef<TelemetryFrame[]>([]);
   const [historyFrames, setHistoryFrames] = useState<TelemetryFrame[]>([]);
   const [scrubIndex, setScrubIndex] = useState<number | null>(null);
   const [isBlackBoxPlaying, setIsBlackBoxPlaying] = useState<boolean>(false);
 
+  // Refs
+  const historyBufferRef = useRef<TelemetryFrame[]>([]);
   const socketRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<number | null>(null);
   const retryCountRef = useRef<number>(0);
