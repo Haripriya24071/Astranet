@@ -13,6 +13,7 @@ import SelectedSatelliteRightPanel from "./SelectedSatelliteRightPanel";
 import MetricsBottomBar from "./MetricsBottomBar";
 import FaultInjectionModal from "./FaultInjectionModal";
 import LiveGlobeHUD from "./LiveGlobeHUD";
+import ScenarioSimulationPanel from "./ScenarioSimulationPanel";
 import { useExternalMissionContext } from "../../hooks/useExternalMissionContext";
 import { Search, ArrowLeft } from "lucide-react";
 
@@ -31,6 +32,7 @@ export default function MissionControlDashboard({
     clock,
     swarmSummary,
     autonomy,
+    apiBaseUrl,
     links,
     isConnected,
     isReconnecting,
@@ -264,23 +266,29 @@ export default function MissionControlDashboard({
 
         {/* VAST OPEN CENTER GLOBE STAGE (UNDISPUTED HERO) */}
         <main className="flex-1 relative h-full flex flex-col bg-[#05080D] overflow-hidden">
-          <CesiumGlobe
-            satellites={satellites}
-            selectedSatelliteId={selectedSatelliteId}
-            onSelectSatellite={setSelectedSatelliteId}
-            missionTime={formatMissionTime(currentMissionElapsedSec)}
-            coordinatorId={coordinatorId}
-            activeLinks={links}
-          />
+          {activeNavTab === "Simulation" ? (
+            <ScenarioSimulationPanel apiBaseUrl={apiBaseUrl} />
+          ) : (
+            <>
+              <CesiumGlobe
+                satellites={satellites}
+                selectedSatelliteId={selectedSatelliteId}
+                onSelectSatellite={setSelectedSatelliteId}
+                missionTime={formatMissionTime(currentMissionElapsedSec)}
+                coordinatorId={coordinatorId}
+                activeLinks={links}
+              />
 
-          <LiveGlobeHUD
-            satellites={satellites}
-            events={events}
-            networkMetrics={networkMetrics}
-            swarmSummary={swarmSummary}
-            autonomy={autonomy}
-            isConnected={isConnected}
-          />
+              <LiveGlobeHUD
+                satellites={satellites}
+                events={events}
+                networkMetrics={networkMetrics}
+                swarmSummary={swarmSummary}
+                autonomy={autonomy}
+                isConnected={isConnected}
+              />
+            </>
+          )}
         </main>
 
         {/* CLEAN RIGHT SELECTED SATELLITE PANEL (320px) */}
