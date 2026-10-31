@@ -18,6 +18,8 @@ from backend.app.core.satellite import CubeSat, SatelliteRole, SatelliteState
 from backend.app.core.network import NetworkTopology, DEFAULT_MAX_ISL_RANGE_M
 from backend.app.core.faults import FaultEngine, FaultEvent, FailureType, FailureSeverity
 from backend.app.core.recovery import RecoveryEngine, RecoveryEvent
+from backend.autonomy.diagnosis import FaultAttributor
+from backend.autonomy.mission_model import SwarmMissionModel
 
 
 # Canonical Constellation Planes matching ASTRANET architecture
@@ -77,6 +79,8 @@ class SwarmOrchestrator:
         self.network: NetworkTopology = NetworkTopology(max_range_m=max_isl_range_m)
         self.fault_engine: FaultEngine = FaultEngine()
         self.recovery_engine: RecoveryEngine = RecoveryEngine()
+        self.fault_attributor: FaultAttributor = FaultAttributor()
+        self.mission_model: SwarmMissionModel = SwarmMissionModel()
 
         self._satellites_map: Dict[str, CubeSat] = {}
         self._satellites_list: List[CubeSat] = []
@@ -157,6 +161,7 @@ class SwarmOrchestrator:
         # Initial network evaluation
         self.network.update(self._satellites_list)
         self._sync_network_neighbors()
+        SwarmMissionModel.sync_mission_state(self._satellites_list, self.network, 0.0)
 
     def get_satellite(self, satellite_id: str) -> Optional[CubeSat]:
         """Look up a satellite by its unique identifier."""
@@ -202,6 +207,19 @@ class SwarmOrchestrator:
         self.network.update(self._satellites_list)
         self._sync_network_neighbors()
 
+        # Phase 1 Autonomy: Probabilistic fault diagnosis and swarm mission impact update
+        self.fault_attributor.diagnose_satellite(
+            satellite=sat,
+            network=self.network,
+            sim_time_sec=self.clock.elapsed_seconds,
+            fault_event=event,
+        )
+        SwarmMissionModel.sync_mission_state(
+            satellites=self._satellites_list,
+            network=self.network,
+            sim_time_sec=self.clock.elapsed_seconds,
+        )
+
         return event
 
     def step(self, dt: Optional[float] = None) -> float:
@@ -235,6 +253,13 @@ class SwarmOrchestrator:
         self.network.update(self._satellites_list)
         self._sync_network_neighbors()
 
+        # Phase 1 Autonomy: Synchronize capability graphs and mission degradation modes
+        SwarmMissionModel.sync_mission_state(
+            satellites=self._satellites_list,
+            network=self.network,
+            sim_time_sec=elapsed_sec,
+        )
+
         return elapsed_sec
 
     def reset(self, initial_elapsed_sec: float = 0.0) -> None:
@@ -267,6 +292,13 @@ class SwarmOrchestrator:
         else:
             coordinator_id = "NONE"
 
+        # Phase 1 Autonomy: Swarm Mission Model evaluation
+        mission_report = SwarmMissionModel.evaluate_swarm(
+            satellites=self._satellites_list,
+            network=self.network,
+            sim_time_sec=self.clock.elapsed_seconds,
+        )
+
         all_events = self.events
         return {
             "clock": self.clock.to_dict(),
@@ -281,6 +313,8 @@ class SwarmOrchestrator:
                 "failed": failed_count,
                 "coordinatorId": coordinator_id,
                 "missionCode": "EO-01",
-                "missionState": "NOMINAL" if failed_count == 0 else "DEGRADED",
+                "missionState": mission_report.mission_mode.value,
+                "missionScore": round(mission_report.mission_score, 1),
+                "coverageRatio": round(mission_report.coverage_ratio, 2),
             },
         }
