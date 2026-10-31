@@ -40,7 +40,7 @@ class TestPhase6ScenarioValidation(unittest.TestCase):
     def test_all_scenario_json_files_load_and_validate(self) -> None:
         """Requirement 1: All production JSON scenarios in backend/scenarios/ must load cleanly."""
         scenarios = list_available_scenarios()
-        self.assertGreaterEqual(len(scenarios), 5, "Must discover at least 5 benchmark scenarios")
+        self.assertGreaterEqual(len(scenarios), 10, "Must discover at least 5 benchmark scenarios")
 
         expected_ids = {
             "nominal_flight",
@@ -48,6 +48,11 @@ class TestPhase6ScenarioValidation(unittest.TestCase):
             "cascade_failure",
             "network_partition",
             "seeded_random_faults",
+            "propulsion_failure",
+            "comms_failure",
+            "low_energy",
+            "stale_state",
+            "byzantine_node",
         }
         discovered_ids = {s["id"] for s in scenarios}
         self.assertTrue(expected_ids.issubset(discovered_ids), f"Missing scenarios: {expected_ids - discovered_ids}")
@@ -375,6 +380,79 @@ class TestPhase6AccuracyAndLeadershipSemantics(unittest.TestCase):
         part_res = runner.run(partition_def)
         self.assertEqual(part_res.baseline_metrics.coordinator_id, "SAT-07")
         self.assertEqual(part_res.final_metrics.coordinator_id, "UNRESOLVED")
+
+
+
+
+class TestPhase6PropulsionFailure(unittest.TestCase):
+    """Propulsion-only partial failure: Capability-loss reasoning preserves sensing and relay."""
+
+    def test_propulsion_failure_preserves_non_propulsion_capabilities(self) -> None:
+        scen_def = load_scenario_from_file("propulsion_failure")
+        runner = ScenarioRunner()
+        result = runner.run(scen_def)
+
+        self.assertEqual(result.status, ScenarioStatus.PASS, f"Scenario failed: {result.failure_reasons}")
+        self.assertEqual(result.faults_injected_count, 1)
+        self.assertEqual(result.final_metrics.nominal_count, 11)
+        self.assertEqual(result.final_metrics.degraded_count, 1)
+        self.assertEqual(result.final_metrics.failed_count, 0)
+        self.assertEqual(result.final_metrics.satellite_states["SAT-03"], "DEGRADED")
+        self.assertTrue(result.no_manual_intervention)
+
+
+class TestPhase6CommsFailure(unittest.TestCase):
+    """Comms failure on primary relay triggers intra-plane relay handover."""
+
+    def test_comms_failure_promotes_healthy_plane_observer(self) -> None:
+        scen_def = load_scenario_from_file("comms_failure")
+        runner = ScenarioRunner()
+        result = runner.run(scen_def)
+
+        self.assertEqual(result.status, ScenarioStatus.PASS, f"Scenario failed: {result.failure_reasons}")
+        self.assertEqual(result.faults_injected_count, 1)
+        self.assertEqual(result.final_metrics.failed_count, 1)
+        self.assertTrue(any("PLANE B" in r["message"] and "SAT-08" in r["message"] for r in result.role_reassignments))
+        self.assertIn("SAT-08", result.remaining_unrecoverable)
+
+
+class TestPhase6LowEnergy(unittest.TestCase):
+    """Power degradation triggers load shedding and survival mode."""
+
+    def test_power_degradation_contained(self) -> None:
+        scen_def = load_scenario_from_file("low_energy")
+        runner = ScenarioRunner()
+        result = runner.run(scen_def)
+
+        self.assertEqual(result.status, ScenarioStatus.PASS, f"Scenario failed: {result.failure_reasons}")
+        self.assertEqual(result.faults_injected_count, 1)
+        self.assertIn("SAT-05", result.remaining_unrecoverable)
+
+
+class TestPhase6StaleState(unittest.TestCase):
+    """Stale-state epoch desync recovered via compute watchdog reset."""
+
+    def test_stale_state_recovered_via_reset_compute(self) -> None:
+        scen_def = load_scenario_from_file("stale_state")
+        runner = ScenarioRunner()
+        result = runner.run(scen_def)
+
+        self.assertEqual(result.status, ScenarioStatus.PASS, f"Scenario failed: {result.failure_reasons}")
+        self.assertTrue(any(r["satelliteId"] == "SAT-01" for r in result.completed_recoveries))
+        self.assertEqual(result.final_metrics.nominal_count, 12)
+
+
+class TestPhase6ByzantineNode(unittest.TestCase):
+    """Byzantine node detected by peer consensus and quarantined."""
+
+    def test_byzantine_node_quarantined_and_isolated(self) -> None:
+        scen_def = load_scenario_from_file("byzantine_node")
+        runner = ScenarioRunner()
+        result = runner.run(scen_def)
+
+        self.assertEqual(result.status, ScenarioStatus.PASS, f"Scenario failed: {result.failure_reasons}")
+        self.assertIn("SAT-10", result.remaining_unrecoverable)
+        self.assertEqual(result.final_metrics.satellite_states["SAT-10"], "ISOLATED")
 
 
 if __name__ == "__main__":

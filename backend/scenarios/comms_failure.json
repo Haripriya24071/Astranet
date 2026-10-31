@@ -1,0 +1,48 @@
+{
+  "version": "1.0.0",
+  "id": "comms_failure",
+  "name": "Inter-Satellite Link Relay Failure & Dynamic Intra-Plane Promotion",
+  "description": "Validates autonomous peer detection and dynamic relay handover (Master Blueprint v2.0 Section 16 & 18). Primary relay SAT-08 in Plane B experiences critical transceiver burnout at t=2.0s. Surviving peers in Plane B detect link termination, attribute the hardware fault as unrecoverable, and autonomously promote healthy observer SAT-06 to RELAY, restoring intra-plane ISL communications without operator intervention.",
+  "configuration": {
+    "duration_sec": 12.0,
+    "time_step_sec": 0.5,
+    "time_warp": 1.0,
+    "max_isl_range_m": 5000000.0,
+    "random_seed": null
+  },
+  "initial_invariants": {
+    "min_nominal_satellites": 12,
+    "expected_coordinator": "SAT-07",
+    "expected_relays": ["SAT-04", "SAT-08", "SAT-12"]
+  },
+  "scheduled_faults": [
+    {
+      "time_sec": 2.0,
+      "satellite_id": "SAT-08",
+      "failure_type": "Communication Failure",
+      "severity": "CRITICAL",
+      "description": "Primary relay transceiver burnout on SAT-08 in Plane B"
+    }
+  ],
+  "expected_outcomes": {
+    "max_detection_delay_sec": 1.0,
+    "expected_role_reassignments": [
+      {
+        "plane": "PLANE B",
+        "new_role": "RELAY",
+        "replaced_satellite_id": "SAT-08"
+      }
+    ],
+    "expected_completed_recoveries": [],
+    "unrecoverable_satellites": ["SAT-08"],
+    "allowed_unresolved_conditions": [],
+    "require_no_manual_intervention": true
+  },
+  "acceptance_thresholds": {
+    "min_nominal_at_end": 11,
+    "max_failed_at_end": 1,
+    "max_degraded_at_end": 0,
+    "min_active_links_at_end": 4,
+    "expected_coordinator_at_end": "SAT-07"
+  }
+}

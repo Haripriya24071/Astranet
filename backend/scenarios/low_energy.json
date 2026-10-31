@@ -1,0 +1,42 @@
+{
+  "version": "1.0.0",
+  "id": "low_energy",
+  "name": "Power Degradation & Low-Energy Autonomous Preservation",
+  "description": "Demonstrates resource-aware degradation and emergency load shedding (Master Blueprint v2.0 Section 3.18 & 16). SAT-05 in Plane B suffers critical solar array regulation failure and rapid power loss at t=2.0s. The autonomy engine detects the power crisis, transitions the satellite to safe degraded survival mode, and sheds payload demands to preserve core telemetry and ISL connectivity without manual intervention.",
+  "configuration": {
+    "duration_sec": 10.0,
+    "time_step_sec": 0.5,
+    "time_warp": 1.0,
+    "max_isl_range_m": 5000000.0,
+    "random_seed": null
+  },
+  "initial_invariants": {
+    "min_nominal_satellites": 12,
+    "expected_coordinator": "SAT-07",
+    "expected_relays": ["SAT-04", "SAT-08", "SAT-12"]
+  },
+  "scheduled_faults": [
+    {
+      "time_sec": 2.0,
+      "satellite_id": "SAT-05",
+      "failure_type": "Power Degradation",
+      "severity": "CRITICAL",
+      "description": "Critical solar power bus regulation anomaly on SAT-05 in Plane B"
+    }
+  ],
+  "expected_outcomes": {
+    "max_detection_delay_sec": 1.0,
+    "expected_role_reassignments": [],
+    "expected_completed_recoveries": [],
+    "unrecoverable_satellites": ["SAT-05"],
+    "allowed_unresolved_conditions": [],
+    "require_no_manual_intervention": true
+  },
+  "acceptance_thresholds": {
+    "min_nominal_at_end": 11,
+    "max_failed_at_end": 1,
+    "max_degraded_at_end": 0,
+    "min_active_links_at_end": 4,
+    "expected_coordinator_at_end": "SAT-07"
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "version": "1.0.0",
+  "id": "stale_state",
+  "name": "Stale-State Disagreement & Watchdog Reset Recovery",
+  "description": "Validates swarm consensus under stale/delayed telemetry (Master Blueprint v2.0 Section 3.10 & 3.11). SAT-01 experiences telemetry epoch desynchronization and stale local state at t=2.0s. The recovery engine detects the divergence, records a trust penalty, initiates an automated onboard flight computer watchdog reset (RESET_COMPUTE), and safely restores SAT-01 to full NOMINAL operational health.",
+  "configuration": {
+    "duration_sec": 12.0,
+    "time_step_sec": 0.5,
+    "time_warp": 1.0,
+    "max_isl_range_m": 5000000.0,
+    "random_seed": null
+  },
+  "initial_invariants": {
+    "min_nominal_satellites": 12,
+    "expected_coordinator": "SAT-07",
+    "expected_relays": ["SAT-04", "SAT-08", "SAT-12"]
+  },
+  "scheduled_faults": [
+    {
+      "time_sec": 2.0,
+      "satellite_id": "SAT-01",
+      "failure_type": "Stale State",
+      "severity": "MODERATE",
+      "description": "Onboard state epoch desynchronization causing stale consensus telemetry on SAT-01"
+    }
+  ],
+  "expected_outcomes": {
+    "max_detection_delay_sec": 1.0,
+    "expected_role_reassignments": [],
+    "expected_completed_recoveries": [
+      {
+        "satellite_id": "SAT-01",
+        "action_type": "RESET_COMPUTE"
+      }
+    ],
+    "unrecoverable_satellites": [],
+    "allowed_unresolved_conditions": [],
+    "require_no_manual_intervention": true
+  },
+  "acceptance_thresholds": {
+    "min_nominal_at_end": 12,
+    "max_failed_at_end": 0,
+    "max_degraded_at_end": 0,
+    "min_active_links_at_end": 4,
+    "expected_coordinator_at_end": "SAT-07"
+  }
+}

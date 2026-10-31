@@ -1,0 +1,26 @@
+{
+  "id": "SAT-01",
+  "plane": 1,
+  "position": [6871.0, 0.0, 0.0],
+  "velocity": [0.0, 7.6, 0.0],
+  "status": "nominal",
+  "subsystemHealth": {
+    "comms": 1.0,
+    "power": 1.0,
+    "propulsion": 1.0,
+    "navigation": 1.0,
+    "attitude": 1.0
+  },
+  "battery": 0.95,
+  "propellant": 0.9,
+  "computeLoad": 0.2,
+  "storage": 0.1,
+  "role": "sensor",
+  "capabilities": ["sensing", "comms", "navigation", "compute"],
+  "neighbors": ["SAT-02", "SAT-04"],
+  "latency": 12.0,
+  "packetLoss": 0.01,
+  "trust": 1.0,
+  "localEpoch": 0,
+  "anomalies": []
+}

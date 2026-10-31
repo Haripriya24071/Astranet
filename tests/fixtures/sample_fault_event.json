@@ -1,0 +1,9 @@
+{
+  "target": "SAT-04",
+  "failureType": "propulsion_failure",
+  "severity": 1.0,
+  "startTime": 120.0,
+  "observability": "partial",
+  "affectedCapabilities": ["propulsion"],
+  "adversarialFlag": false
+}

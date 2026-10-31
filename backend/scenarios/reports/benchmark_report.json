@@ -1,15 +1,422 @@
 {
   "benchmark_suite": "ASTRANET Phase 6 End-to-End Validation",
-  "scenarios_executed": 5,
+  "scenarios_executed": 10,
   "overall_status": "PASS",
   "results": [
+    {
+      "scenario_id": "byzantine_node",
+      "scenario_name": "Byzantine Spacecraft Quarantine & Consensus Integrity",
+      "status": "PASS",
+      "duration_sim_sec": 10.0,
+      "steps_executed": 20,
+      "wall_clock_duration_sec": 0.047,
+      "baseline_metrics": {
+        "sim_time_sec": 0.0,
+        "nominal_count": 12,
+        "degraded_count": 0,
+        "failed_count": 0,
+        "isolated_count": 0,
+        "active_links_count": 6,
+        "partition_count": 6,
+        "connected_components": [
+          2,
+          2,
+          2,
+          2,
+          2,
+          2
+        ],
+        "is_network_connected": false,
+        "coordinator_id": "SAT-07",
+        "is_leadership_unresolved": false,
+        "average_battery": 88.92,
+        "average_propellant": 78.58,
+        "satellite_states": {
+          "SAT-01": "NOMINAL",
+          "SAT-02": "NOMINAL",
+          "SAT-03": "NOMINAL",
+          "SAT-04": "NOMINAL",
+          "SAT-05": "NOMINAL",
+          "SAT-06": "NOMINAL",
+          "SAT-07": "NOMINAL",
+          "SAT-08": "NOMINAL",
+          "SAT-09": "NOMINAL",
+          "SAT-10": "NOMINAL",
+          "SAT-11": "NOMINAL",
+          "SAT-12": "NOMINAL"
+        }
+      },
+      "faulted_metrics": {
+        "sim_time_sec": 2.0,
+        "nominal_count": 11,
+        "degraded_count": 0,
+        "failed_count": 1,
+        "isolated_count": 0,
+        "active_links_count": 5,
+        "partition_count": 7,
+        "connected_components": [
+          2,
+          2,
+          2,
+          2,
+          2,
+          1,
+          1
+        ],
+        "is_network_connected": false,
+        "coordinator_id": "SAT-07",
+        "is_leadership_unresolved": false,
+        "average_battery": 88.92,
+        "average_propellant": 78.58,
+        "satellite_states": {
+          "SAT-01": "NOMINAL",
+          "SAT-02": "NOMINAL",
+          "SAT-03": "NOMINAL",
+          "SAT-04": "NOMINAL",
+          "SAT-05": "NOMINAL",
+          "SAT-06": "NOMINAL",
+          "SAT-07": "NOMINAL",
+          "SAT-08": "NOMINAL",
+          "SAT-09": "NOMINAL",
+          "SAT-10": "FAILED",
+          "SAT-11": "NOMINAL",
+          "SAT-12": "NOMINAL"
+        }
+      },
+      "final_metrics": {
+        "sim_time_sec": 10.0,
+        "nominal_count": 11,
+        "degraded_count": 0,
+        "failed_count": 0,
+        "isolated_count": 1,
+        "active_links_count": 5,
+        "partition_count": 7,
+        "connected_components": [
+          2,
+          2,
+          2,
+          2,
+          2,
+          1,
+          1
+        ],
+        "is_network_connected": false,
+        "coordinator_id": "SAT-07",
+        "is_leadership_unresolved": false,
+        "average_battery": 88.92,
+        "average_propellant": 78.58,
+        "satellite_states": {
+          "SAT-01": "NOMINAL",
+          "SAT-02": "NOMINAL",
+          "SAT-03": "NOMINAL",
+          "SAT-04": "NOMINAL",
+          "SAT-05": "NOMINAL",
+          "SAT-06": "NOMINAL",
+          "SAT-07": "NOMINAL",
+          "SAT-08": "NOMINAL",
+          "SAT-09": "NOMINAL",
+          "SAT-10": "ISOLATED",
+          "SAT-11": "NOMINAL",
+          "SAT-12": "NOMINAL"
+        }
+      },
+      "detection_delays": {
+        "SAT-10": 0.5
+      },
+      "recovery_times": {
+        "SAT-10": 3.5
+      },
+      "faults_injected_count": 1,
+      "autonomous_events_count": 4,
+      "role_reassignments": [
+        {
+          "satelliteId": "SAT-11",
+          "timestamp": 2.5,
+          "message": "Relay reassignment: SAT-11 promoted to RELAY in PLANE C replacing SAT-12 (promoted to RELAY with 1 active ISL neighbors)"
+        }
+      ],
+      "completed_recoveries": [
+        {
+          "satelliteId": "SAT-10",
+          "timestamp": 5.5,
+          "message": "SAT-10 compute watchdog reset successful: flight software restored to NOMINAL"
+        }
+      ],
+      "remaining_unrecoverable": [
+        "SAT-10"
+      ],
+      "timeline": [
+        {
+          "step": 0,
+          "simTimeSec": 0.0,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 1,
+          "simTimeSec": 0.5,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 2,
+          "simTimeSec": 1.0,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 3,
+          "simTimeSec": 1.5,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 4,
+          "simTimeSec": 2.0,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 5,
+          "simTimeSec": 2.5,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": [
+            "Local peer observation confirmed anomaly for SAT-10 (single-peer check; no multi-peer consensus; simulated telemetry inspection)",
+            "SAT-10 entered RECOVERING: initiated RESET_COMPUTE (est. 3.0s sim time)",
+            "Relay reassignment: SAT-11 promoted to RELAY in PLANE C replacing SAT-12 (promoted to RELAY with 1 active ISL neighbors)"
+          ]
+        },
+        {
+          "step": 6,
+          "simTimeSec": 3.0,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 7,
+          "simTimeSec": 3.5,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 8,
+          "simTimeSec": 4.0,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 9,
+          "simTimeSec": 4.5,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 10,
+          "simTimeSec": 5.0,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 11,
+          "simTimeSec": 5.5,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": [
+            "SAT-10 compute watchdog reset successful: flight software restored to NOMINAL"
+          ]
+        },
+        {
+          "step": 12,
+          "simTimeSec": 6.0,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 13,
+          "simTimeSec": 6.5,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 14,
+          "simTimeSec": 7.0,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 15,
+          "simTimeSec": 7.5,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 16,
+          "simTimeSec": 8.0,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 17,
+          "simTimeSec": 8.5,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 18,
+          "simTimeSec": 9.0,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 19,
+          "simTimeSec": 9.5,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 20,
+          "simTimeSec": 10.0,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        }
+      ],
+      "acceptance_checks": [
+        {
+          "name": "Initial Invariant: Nominal Count",
+          "passed": true,
+          "details": "All 12 satellites nominal at t=0",
+          "expected": null,
+          "actual": null
+        },
+        {
+          "name": "Initial Invariant: Coordinator",
+          "passed": true,
+          "details": "Bootstrap coordinator verified as SAT-07 at t=0 (pre-failure swarm initialization)",
+          "expected": null,
+          "actual": null
+        },
+        {
+          "name": "Scheduled Fault Execution",
+          "passed": true,
+          "details": "All 1 scheduled fault injections executed at specified simulation timestamps",
+          "expected": null,
+          "actual": null
+        },
+        {
+          "name": "Autonomous Detection Delay",
+          "passed": true,
+          "details": "All fault detections completed within threshold (1.0s max)",
+          "expected": null,
+          "actual": null
+        },
+        {
+          "name": "Unrecoverable Fault Containment (SAT-10)",
+          "passed": true,
+          "details": "SAT-10 correctly contained in state ISOLATED (never falsely restored to NOMINAL)",
+          "expected": null,
+          "actual": null
+        },
+        {
+          "name": "Final Nominal Satellites",
+          "passed": true,
+          "details": "Final nominal count: 11 >= threshold 11",
+          "expected": 11,
+          "actual": 11
+        },
+        {
+          "name": "Final Failed Satellites",
+          "passed": true,
+          "details": "Final failed count: 0 <= threshold 1",
+          "expected": 1,
+          "actual": 0
+        },
+        {
+          "name": "Final Active ISL Links",
+          "passed": true,
+          "details": "Final active ISL links: 5 >= threshold 4 (local active ISL links)",
+          "expected": 4,
+          "actual": 5
+        },
+        {
+          "name": "Final Coordinator Status",
+          "passed": true,
+          "details": "Final coordinator verified as SAT-07",
+          "expected": "SAT-07",
+          "actual": "SAT-07"
+        }
+      ],
+      "failure_reasons": [],
+      "no_manual_intervention": true
+    },
     {
       "scenario_id": "cascade_failure",
       "scenario_name": "Cascading Multi-Subsystem Failure & Containment",
       "status": "PASS",
       "duration_sim_sec": 16.0,
       "steps_executed": 32,
-      "wall_clock_duration_sec": 0.0276,
+      "wall_clock_duration_sec": 0.0796,
       "baseline_metrics": {
         "sim_time_sec": 0.0,
         "nominal_count": 12,
@@ -578,12 +985,452 @@
       "no_manual_intervention": true
     },
     {
+      "scenario_id": "comms_failure",
+      "scenario_name": "Inter-Satellite Link Relay Failure & Dynamic Intra-Plane Promotion",
+      "status": "PASS",
+      "duration_sim_sec": 12.0,
+      "steps_executed": 24,
+      "wall_clock_duration_sec": 0.0566,
+      "baseline_metrics": {
+        "sim_time_sec": 0.0,
+        "nominal_count": 12,
+        "degraded_count": 0,
+        "failed_count": 0,
+        "isolated_count": 0,
+        "active_links_count": 6,
+        "partition_count": 6,
+        "connected_components": [
+          2,
+          2,
+          2,
+          2,
+          2,
+          2
+        ],
+        "is_network_connected": false,
+        "coordinator_id": "SAT-07",
+        "is_leadership_unresolved": false,
+        "average_battery": 88.92,
+        "average_propellant": 78.58,
+        "satellite_states": {
+          "SAT-01": "NOMINAL",
+          "SAT-02": "NOMINAL",
+          "SAT-03": "NOMINAL",
+          "SAT-04": "NOMINAL",
+          "SAT-05": "NOMINAL",
+          "SAT-06": "NOMINAL",
+          "SAT-07": "NOMINAL",
+          "SAT-08": "NOMINAL",
+          "SAT-09": "NOMINAL",
+          "SAT-10": "NOMINAL",
+          "SAT-11": "NOMINAL",
+          "SAT-12": "NOMINAL"
+        }
+      },
+      "faulted_metrics": {
+        "sim_time_sec": 2.0,
+        "nominal_count": 11,
+        "degraded_count": 0,
+        "failed_count": 1,
+        "isolated_count": 0,
+        "active_links_count": 5,
+        "partition_count": 7,
+        "connected_components": [
+          2,
+          2,
+          2,
+          2,
+          2,
+          1,
+          1
+        ],
+        "is_network_connected": false,
+        "coordinator_id": "SAT-07",
+        "is_leadership_unresolved": false,
+        "average_battery": 88.92,
+        "average_propellant": 78.58,
+        "satellite_states": {
+          "SAT-01": "NOMINAL",
+          "SAT-02": "NOMINAL",
+          "SAT-03": "NOMINAL",
+          "SAT-04": "NOMINAL",
+          "SAT-05": "NOMINAL",
+          "SAT-06": "NOMINAL",
+          "SAT-07": "NOMINAL",
+          "SAT-08": "FAILED",
+          "SAT-09": "NOMINAL",
+          "SAT-10": "NOMINAL",
+          "SAT-11": "NOMINAL",
+          "SAT-12": "NOMINAL"
+        }
+      },
+      "final_metrics": {
+        "sim_time_sec": 12.0,
+        "nominal_count": 11,
+        "degraded_count": 0,
+        "failed_count": 1,
+        "isolated_count": 0,
+        "active_links_count": 5,
+        "partition_count": 7,
+        "connected_components": [
+          2,
+          2,
+          2,
+          2,
+          2,
+          1,
+          1
+        ],
+        "is_network_connected": false,
+        "coordinator_id": "SAT-07",
+        "is_leadership_unresolved": false,
+        "average_battery": 88.92,
+        "average_propellant": 78.58,
+        "satellite_states": {
+          "SAT-01": "NOMINAL",
+          "SAT-02": "NOMINAL",
+          "SAT-03": "NOMINAL",
+          "SAT-04": "NOMINAL",
+          "SAT-05": "NOMINAL",
+          "SAT-06": "NOMINAL",
+          "SAT-07": "NOMINAL",
+          "SAT-08": "FAILED",
+          "SAT-09": "NOMINAL",
+          "SAT-10": "NOMINAL",
+          "SAT-11": "NOMINAL",
+          "SAT-12": "NOMINAL"
+        }
+      },
+      "detection_delays": {
+        "SAT-08": 0.5
+      },
+      "recovery_times": {},
+      "faults_injected_count": 1,
+      "autonomous_events_count": 3,
+      "role_reassignments": [
+        {
+          "satelliteId": "SAT-06",
+          "timestamp": 2.5,
+          "message": "Relay reassignment: SAT-06 promoted to RELAY in PLANE B replacing SAT-08 (promoted to RELAY with 1 active ISL neighbors)"
+        }
+      ],
+      "completed_recoveries": [],
+      "remaining_unrecoverable": [
+        "SAT-08"
+      ],
+      "timeline": [
+        {
+          "step": 0,
+          "simTimeSec": 0.0,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 1,
+          "simTimeSec": 0.5,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 2,
+          "simTimeSec": 1.0,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 3,
+          "simTimeSec": 1.5,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 4,
+          "simTimeSec": 2.0,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 5,
+          "simTimeSec": 2.5,
+          "nominal": 11,
+          "failed": 1,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": [
+            "Local peer observation confirmed anomaly for SAT-08 (single-peer check; no multi-peer consensus; simulated telemetry inspection)",
+            "SAT-08 communications hardware unrecoverable: transmitter disabled permanently",
+            "Relay reassignment: SAT-06 promoted to RELAY in PLANE B replacing SAT-08 (promoted to RELAY with 1 active ISL neighbors)"
+          ]
+        },
+        {
+          "step": 6,
+          "simTimeSec": 3.0,
+          "nominal": 11,
+          "failed": 1,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 7,
+          "simTimeSec": 3.5,
+          "nominal": 11,
+          "failed": 1,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 8,
+          "simTimeSec": 4.0,
+          "nominal": 11,
+          "failed": 1,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 9,
+          "simTimeSec": 4.5,
+          "nominal": 11,
+          "failed": 1,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 10,
+          "simTimeSec": 5.0,
+          "nominal": 11,
+          "failed": 1,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 11,
+          "simTimeSec": 5.5,
+          "nominal": 11,
+          "failed": 1,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 12,
+          "simTimeSec": 6.0,
+          "nominal": 11,
+          "failed": 1,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 13,
+          "simTimeSec": 6.5,
+          "nominal": 11,
+          "failed": 1,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 14,
+          "simTimeSec": 7.0,
+          "nominal": 11,
+          "failed": 1,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 15,
+          "simTimeSec": 7.5,
+          "nominal": 11,
+          "failed": 1,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 16,
+          "simTimeSec": 8.0,
+          "nominal": 11,
+          "failed": 1,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 17,
+          "simTimeSec": 8.5,
+          "nominal": 11,
+          "failed": 1,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 18,
+          "simTimeSec": 9.0,
+          "nominal": 11,
+          "failed": 1,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 19,
+          "simTimeSec": 9.5,
+          "nominal": 11,
+          "failed": 1,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 20,
+          "simTimeSec": 10.0,
+          "nominal": 11,
+          "failed": 1,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 21,
+          "simTimeSec": 10.5,
+          "nominal": 11,
+          "failed": 1,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 22,
+          "simTimeSec": 11.0,
+          "nominal": 11,
+          "failed": 1,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 23,
+          "simTimeSec": 11.5,
+          "nominal": 11,
+          "failed": 1,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 24,
+          "simTimeSec": 12.0,
+          "nominal": 11,
+          "failed": 1,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        }
+      ],
+      "acceptance_checks": [
+        {
+          "name": "Initial Invariant: Nominal Count",
+          "passed": true,
+          "details": "All 12 satellites nominal at t=0",
+          "expected": null,
+          "actual": null
+        },
+        {
+          "name": "Initial Invariant: Coordinator",
+          "passed": true,
+          "details": "Bootstrap coordinator verified as SAT-07 at t=0 (pre-failure swarm initialization)",
+          "expected": null,
+          "actual": null
+        },
+        {
+          "name": "Scheduled Fault Execution",
+          "passed": true,
+          "details": "All 1 scheduled fault injections executed at specified simulation timestamps",
+          "expected": null,
+          "actual": null
+        },
+        {
+          "name": "Autonomous Detection Delay",
+          "passed": true,
+          "details": "All fault detections completed within threshold (1.0s max)",
+          "expected": null,
+          "actual": null
+        },
+        {
+          "name": "Role Reassignment (PLANE B RELAY)",
+          "passed": true,
+          "details": "Relay reassignment confirmed in PLANE B replacing SAT-08 (local ISL links preserved)",
+          "expected": null,
+          "actual": null
+        },
+        {
+          "name": "Unrecoverable Fault Containment (SAT-08)",
+          "passed": true,
+          "details": "SAT-08 correctly contained in state FAILED (never falsely restored to NOMINAL)",
+          "expected": null,
+          "actual": null
+        },
+        {
+          "name": "Final Nominal Satellites",
+          "passed": true,
+          "details": "Final nominal count: 11 >= threshold 11",
+          "expected": 11,
+          "actual": 11
+        },
+        {
+          "name": "Final Failed Satellites",
+          "passed": true,
+          "details": "Final failed count: 1 <= threshold 1",
+          "expected": 1,
+          "actual": 1
+        },
+        {
+          "name": "Final Active ISL Links",
+          "passed": true,
+          "details": "Final active ISL links: 5 >= threshold 4 (local active ISL links)",
+          "expected": 4,
+          "actual": 5
+        },
+        {
+          "name": "Final Coordinator Status",
+          "passed": true,
+          "details": "Final coordinator verified as SAT-07",
+          "expected": "SAT-07",
+          "actual": "SAT-07"
+        }
+      ],
+      "failure_reasons": [],
+      "no_manual_intervention": true
+    },
+    {
       "scenario_id": "dual_node_failure",
       "scenario_name": "Dual-Node Failure & Autonomous Local Recovery",
       "status": "PASS",
       "duration_sim_sec": 15.0,
       "steps_executed": 30,
-      "wall_clock_duration_sec": 0.0292,
+      "wall_clock_duration_sec": 0.0672,
       "baseline_metrics": {
         "sim_time_sec": 0.0,
         "nominal_count": 12,
@@ -1093,12 +1940,402 @@
       "no_manual_intervention": true
     },
     {
+      "scenario_id": "low_energy",
+      "scenario_name": "Power Degradation & Low-Energy Autonomous Preservation",
+      "status": "PASS",
+      "duration_sim_sec": 10.0,
+      "steps_executed": 20,
+      "wall_clock_duration_sec": 0.0429,
+      "baseline_metrics": {
+        "sim_time_sec": 0.0,
+        "nominal_count": 12,
+        "degraded_count": 0,
+        "failed_count": 0,
+        "isolated_count": 0,
+        "active_links_count": 6,
+        "partition_count": 6,
+        "connected_components": [
+          2,
+          2,
+          2,
+          2,
+          2,
+          2
+        ],
+        "is_network_connected": false,
+        "coordinator_id": "SAT-07",
+        "is_leadership_unresolved": false,
+        "average_battery": 88.92,
+        "average_propellant": 78.58,
+        "satellite_states": {
+          "SAT-01": "NOMINAL",
+          "SAT-02": "NOMINAL",
+          "SAT-03": "NOMINAL",
+          "SAT-04": "NOMINAL",
+          "SAT-05": "NOMINAL",
+          "SAT-06": "NOMINAL",
+          "SAT-07": "NOMINAL",
+          "SAT-08": "NOMINAL",
+          "SAT-09": "NOMINAL",
+          "SAT-10": "NOMINAL",
+          "SAT-11": "NOMINAL",
+          "SAT-12": "NOMINAL"
+        }
+      },
+      "faulted_metrics": {
+        "sim_time_sec": 2.0,
+        "nominal_count": 11,
+        "degraded_count": 0,
+        "failed_count": 1,
+        "isolated_count": 0,
+        "active_links_count": 5,
+        "partition_count": 7,
+        "connected_components": [
+          2,
+          2,
+          2,
+          2,
+          2,
+          1,
+          1
+        ],
+        "is_network_connected": false,
+        "coordinator_id": "SAT-07",
+        "is_leadership_unresolved": false,
+        "average_battery": 85.17,
+        "average_propellant": 78.58,
+        "satellite_states": {
+          "SAT-01": "NOMINAL",
+          "SAT-02": "NOMINAL",
+          "SAT-03": "NOMINAL",
+          "SAT-04": "NOMINAL",
+          "SAT-05": "FAILED",
+          "SAT-06": "NOMINAL",
+          "SAT-07": "NOMINAL",
+          "SAT-08": "NOMINAL",
+          "SAT-09": "NOMINAL",
+          "SAT-10": "NOMINAL",
+          "SAT-11": "NOMINAL",
+          "SAT-12": "NOMINAL"
+        }
+      },
+      "final_metrics": {
+        "sim_time_sec": 10.0,
+        "nominal_count": 11,
+        "degraded_count": 0,
+        "failed_count": 1,
+        "isolated_count": 0,
+        "active_links_count": 5,
+        "partition_count": 7,
+        "connected_components": [
+          2,
+          2,
+          2,
+          2,
+          2,
+          1,
+          1
+        ],
+        "is_network_connected": false,
+        "coordinator_id": "SAT-07",
+        "is_leadership_unresolved": false,
+        "average_battery": 85.17,
+        "average_propellant": 78.58,
+        "satellite_states": {
+          "SAT-01": "NOMINAL",
+          "SAT-02": "NOMINAL",
+          "SAT-03": "NOMINAL",
+          "SAT-04": "NOMINAL",
+          "SAT-05": "FAILED",
+          "SAT-06": "NOMINAL",
+          "SAT-07": "NOMINAL",
+          "SAT-08": "NOMINAL",
+          "SAT-09": "NOMINAL",
+          "SAT-10": "NOMINAL",
+          "SAT-11": "NOMINAL",
+          "SAT-12": "NOMINAL"
+        }
+      },
+      "detection_delays": {
+        "SAT-05": 0.5
+      },
+      "recovery_times": {},
+      "faults_injected_count": 1,
+      "autonomous_events_count": 2,
+      "role_reassignments": [],
+      "completed_recoveries": [],
+      "remaining_unrecoverable": [
+        "SAT-05"
+      ],
+      "timeline": [
+        {
+          "step": 0,
+          "simTimeSec": 0.0,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 1,
+          "simTimeSec": 0.5,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 2,
+          "simTimeSec": 1.0,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 3,
+          "simTimeSec": 1.5,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 4,
+          "simTimeSec": 2.0,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 5,
+          "simTimeSec": 2.5,
+          "nominal": 11,
+          "failed": 1,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": [
+            "Local peer observation confirmed anomaly for SAT-05 (single-peer check; no multi-peer consensus; simulated telemetry inspection)",
+            "SAT-05 Power Degradation unrecoverable: operating in safe degraded mode"
+          ]
+        },
+        {
+          "step": 6,
+          "simTimeSec": 3.0,
+          "nominal": 11,
+          "failed": 1,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 7,
+          "simTimeSec": 3.5,
+          "nominal": 11,
+          "failed": 1,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 8,
+          "simTimeSec": 4.0,
+          "nominal": 11,
+          "failed": 1,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 9,
+          "simTimeSec": 4.5,
+          "nominal": 11,
+          "failed": 1,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 10,
+          "simTimeSec": 5.0,
+          "nominal": 11,
+          "failed": 1,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 11,
+          "simTimeSec": 5.5,
+          "nominal": 11,
+          "failed": 1,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 12,
+          "simTimeSec": 6.0,
+          "nominal": 11,
+          "failed": 1,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 13,
+          "simTimeSec": 6.5,
+          "nominal": 11,
+          "failed": 1,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 14,
+          "simTimeSec": 7.0,
+          "nominal": 11,
+          "failed": 1,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 15,
+          "simTimeSec": 7.5,
+          "nominal": 11,
+          "failed": 1,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 16,
+          "simTimeSec": 8.0,
+          "nominal": 11,
+          "failed": 1,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 17,
+          "simTimeSec": 8.5,
+          "nominal": 11,
+          "failed": 1,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 18,
+          "simTimeSec": 9.0,
+          "nominal": 11,
+          "failed": 1,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 19,
+          "simTimeSec": 9.5,
+          "nominal": 11,
+          "failed": 1,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        },
+        {
+          "step": 20,
+          "simTimeSec": 10.0,
+          "nominal": 11,
+          "failed": 1,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 5,
+          "events": []
+        }
+      ],
+      "acceptance_checks": [
+        {
+          "name": "Initial Invariant: Nominal Count",
+          "passed": true,
+          "details": "All 12 satellites nominal at t=0",
+          "expected": null,
+          "actual": null
+        },
+        {
+          "name": "Initial Invariant: Coordinator",
+          "passed": true,
+          "details": "Bootstrap coordinator verified as SAT-07 at t=0 (pre-failure swarm initialization)",
+          "expected": null,
+          "actual": null
+        },
+        {
+          "name": "Scheduled Fault Execution",
+          "passed": true,
+          "details": "All 1 scheduled fault injections executed at specified simulation timestamps",
+          "expected": null,
+          "actual": null
+        },
+        {
+          "name": "Autonomous Detection Delay",
+          "passed": true,
+          "details": "All fault detections completed within threshold (1.0s max)",
+          "expected": null,
+          "actual": null
+        },
+        {
+          "name": "Unrecoverable Fault Containment (SAT-05)",
+          "passed": true,
+          "details": "SAT-05 correctly contained in state FAILED (never falsely restored to NOMINAL)",
+          "expected": null,
+          "actual": null
+        },
+        {
+          "name": "Final Nominal Satellites",
+          "passed": true,
+          "details": "Final nominal count: 11 >= threshold 11",
+          "expected": 11,
+          "actual": 11
+        },
+        {
+          "name": "Final Failed Satellites",
+          "passed": true,
+          "details": "Final failed count: 1 <= threshold 1",
+          "expected": 1,
+          "actual": 1
+        },
+        {
+          "name": "Final Active ISL Links",
+          "passed": true,
+          "details": "Final active ISL links: 5 >= threshold 4 (local active ISL links)",
+          "expected": 4,
+          "actual": 5
+        },
+        {
+          "name": "Final Coordinator Status",
+          "passed": true,
+          "details": "Final coordinator verified as SAT-07",
+          "expected": "SAT-07",
+          "actual": "SAT-07"
+        }
+      ],
+      "failure_reasons": [],
+      "no_manual_intervention": true
+    },
+    {
       "scenario_id": "network_partition",
       "scenario_name": "Network Partition & Quorum-Constrained Leadership",
       "status": "PASS",
       "duration_sim_sec": 10.0,
       "steps_executed": 20,
-      "wall_clock_duration_sec": 0.0183,
+      "wall_clock_duration_sec": 0.048,
       "baseline_metrics": {
         "sim_time_sec": 0.0,
         "nominal_count": 12,
@@ -1489,7 +2726,7 @@
       "status": "PASS",
       "duration_sim_sec": 10.0,
       "steps_executed": 20,
-      "wall_clock_duration_sec": 0.0189,
+      "wall_clock_duration_sec": 0.0434,
       "baseline_metrics": {
         "sim_time_sec": 0.0,
         "nominal_count": 12,
@@ -1851,12 +3088,391 @@
       "no_manual_intervention": true
     },
     {
+      "scenario_id": "propulsion_failure",
+      "scenario_name": "Propulsion-Only Partial Failure & Capability Preservation",
+      "status": "PASS",
+      "duration_sim_sec": 10.0,
+      "steps_executed": 20,
+      "wall_clock_duration_sec": 0.0549,
+      "baseline_metrics": {
+        "sim_time_sec": 0.0,
+        "nominal_count": 12,
+        "degraded_count": 0,
+        "failed_count": 0,
+        "isolated_count": 0,
+        "active_links_count": 6,
+        "partition_count": 6,
+        "connected_components": [
+          2,
+          2,
+          2,
+          2,
+          2,
+          2
+        ],
+        "is_network_connected": false,
+        "coordinator_id": "SAT-07",
+        "is_leadership_unresolved": false,
+        "average_battery": 88.92,
+        "average_propellant": 78.58,
+        "satellite_states": {
+          "SAT-01": "NOMINAL",
+          "SAT-02": "NOMINAL",
+          "SAT-03": "NOMINAL",
+          "SAT-04": "NOMINAL",
+          "SAT-05": "NOMINAL",
+          "SAT-06": "NOMINAL",
+          "SAT-07": "NOMINAL",
+          "SAT-08": "NOMINAL",
+          "SAT-09": "NOMINAL",
+          "SAT-10": "NOMINAL",
+          "SAT-11": "NOMINAL",
+          "SAT-12": "NOMINAL"
+        }
+      },
+      "faulted_metrics": {
+        "sim_time_sec": 2.0,
+        "nominal_count": 11,
+        "degraded_count": 1,
+        "failed_count": 0,
+        "isolated_count": 0,
+        "active_links_count": 6,
+        "partition_count": 6,
+        "connected_components": [
+          2,
+          2,
+          2,
+          2,
+          2,
+          2
+        ],
+        "is_network_connected": false,
+        "coordinator_id": "SAT-07",
+        "is_leadership_unresolved": false,
+        "average_battery": 88.92,
+        "average_propellant": 78.58,
+        "satellite_states": {
+          "SAT-01": "NOMINAL",
+          "SAT-02": "NOMINAL",
+          "SAT-03": "DEGRADED",
+          "SAT-04": "NOMINAL",
+          "SAT-05": "NOMINAL",
+          "SAT-06": "NOMINAL",
+          "SAT-07": "NOMINAL",
+          "SAT-08": "NOMINAL",
+          "SAT-09": "NOMINAL",
+          "SAT-10": "NOMINAL",
+          "SAT-11": "NOMINAL",
+          "SAT-12": "NOMINAL"
+        }
+      },
+      "final_metrics": {
+        "sim_time_sec": 10.0,
+        "nominal_count": 11,
+        "degraded_count": 1,
+        "failed_count": 0,
+        "isolated_count": 0,
+        "active_links_count": 6,
+        "partition_count": 6,
+        "connected_components": [
+          2,
+          2,
+          2,
+          2,
+          2,
+          2
+        ],
+        "is_network_connected": false,
+        "coordinator_id": "SAT-07",
+        "is_leadership_unresolved": false,
+        "average_battery": 88.92,
+        "average_propellant": 78.58,
+        "satellite_states": {
+          "SAT-01": "NOMINAL",
+          "SAT-02": "NOMINAL",
+          "SAT-03": "DEGRADED",
+          "SAT-04": "NOMINAL",
+          "SAT-05": "NOMINAL",
+          "SAT-06": "NOMINAL",
+          "SAT-07": "NOMINAL",
+          "SAT-08": "NOMINAL",
+          "SAT-09": "NOMINAL",
+          "SAT-10": "NOMINAL",
+          "SAT-11": "NOMINAL",
+          "SAT-12": "NOMINAL"
+        }
+      },
+      "detection_delays": {
+        "SAT-03": 0.5
+      },
+      "recovery_times": {},
+      "faults_injected_count": 1,
+      "autonomous_events_count": 2,
+      "role_reassignments": [],
+      "completed_recoveries": [],
+      "remaining_unrecoverable": [],
+      "timeline": [
+        {
+          "step": 0,
+          "simTimeSec": 0.0,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 1,
+          "simTimeSec": 0.5,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 2,
+          "simTimeSec": 1.0,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 3,
+          "simTimeSec": 1.5,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 4,
+          "simTimeSec": 2.0,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 5,
+          "simTimeSec": 2.5,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": [
+            "Local peer observation confirmed anomaly for SAT-03 (single-peer check; no multi-peer consensus; simulated telemetry inspection)",
+            "SAT-03 propulsion unrecoverable: thruster offline; satellite excluded from maneuvers"
+          ]
+        },
+        {
+          "step": 6,
+          "simTimeSec": 3.0,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 7,
+          "simTimeSec": 3.5,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 8,
+          "simTimeSec": 4.0,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 9,
+          "simTimeSec": 4.5,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 10,
+          "simTimeSec": 5.0,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 11,
+          "simTimeSec": 5.5,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 12,
+          "simTimeSec": 6.0,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 13,
+          "simTimeSec": 6.5,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 14,
+          "simTimeSec": 7.0,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 15,
+          "simTimeSec": 7.5,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 16,
+          "simTimeSec": 8.0,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 17,
+          "simTimeSec": 8.5,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 18,
+          "simTimeSec": 9.0,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 19,
+          "simTimeSec": 9.5,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 20,
+          "simTimeSec": 10.0,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        }
+      ],
+      "acceptance_checks": [
+        {
+          "name": "Initial Invariant: Nominal Count",
+          "passed": true,
+          "details": "All 12 satellites nominal at t=0",
+          "expected": null,
+          "actual": null
+        },
+        {
+          "name": "Initial Invariant: Coordinator",
+          "passed": true,
+          "details": "Bootstrap coordinator verified as SAT-07 at t=0 (pre-failure swarm initialization)",
+          "expected": null,
+          "actual": null
+        },
+        {
+          "name": "Scheduled Fault Execution",
+          "passed": true,
+          "details": "All 1 scheduled fault injections executed at specified simulation timestamps",
+          "expected": null,
+          "actual": null
+        },
+        {
+          "name": "Autonomous Detection Delay",
+          "passed": true,
+          "details": "All fault detections completed within threshold (1.0s max)",
+          "expected": null,
+          "actual": null
+        },
+        {
+          "name": "Final Nominal Satellites",
+          "passed": true,
+          "details": "Final nominal count: 11 >= threshold 11",
+          "expected": 11,
+          "actual": 11
+        },
+        {
+          "name": "Final Failed Satellites",
+          "passed": true,
+          "details": "Final failed count: 0 <= threshold 0",
+          "expected": 0,
+          "actual": 0
+        },
+        {
+          "name": "Final Active ISL Links",
+          "passed": true,
+          "details": "Final active ISL links: 6 >= threshold 4 (local active ISL links)",
+          "expected": 4,
+          "actual": 6
+        },
+        {
+          "name": "Final Coordinator Status",
+          "passed": true,
+          "details": "Final coordinator verified as SAT-07",
+          "expected": "SAT-07",
+          "actual": "SAT-07"
+        }
+      ],
+      "failure_reasons": [],
+      "no_manual_intervention": true
+    },
+    {
       "scenario_id": "seeded_random_faults",
       "scenario_name": "Seeded Stochastic Fault Resilience Benchmark",
       "status": "PASS",
       "duration_sim_sec": 15.0,
       "steps_executed": 30,
-      "wall_clock_duration_sec": 0.0291,
+      "wall_clock_duration_sec": 0.0872,
       "baseline_metrics": {
         "sim_time_sec": 0.0,
         "nominal_count": 12,
@@ -2326,6 +3942,438 @@
           "passed": true,
           "details": "Final nominal count: 12 >= threshold 10",
           "expected": 10,
+          "actual": 12
+        },
+        {
+          "name": "Final Failed Satellites",
+          "passed": true,
+          "details": "Final failed count: 0 <= threshold 0",
+          "expected": 0,
+          "actual": 0
+        },
+        {
+          "name": "Final Active ISL Links",
+          "passed": true,
+          "details": "Final active ISL links: 6 >= threshold 4 (local active ISL links)",
+          "expected": 4,
+          "actual": 6
+        },
+        {
+          "name": "Final Coordinator Status",
+          "passed": true,
+          "details": "Final coordinator verified as SAT-07",
+          "expected": "SAT-07",
+          "actual": "SAT-07"
+        }
+      ],
+      "failure_reasons": [],
+      "no_manual_intervention": true
+    },
+    {
+      "scenario_id": "stale_state",
+      "scenario_name": "Stale-State Disagreement & Watchdog Reset Recovery",
+      "status": "PASS",
+      "duration_sim_sec": 12.0,
+      "steps_executed": 24,
+      "wall_clock_duration_sec": 0.0636,
+      "baseline_metrics": {
+        "sim_time_sec": 0.0,
+        "nominal_count": 12,
+        "degraded_count": 0,
+        "failed_count": 0,
+        "isolated_count": 0,
+        "active_links_count": 6,
+        "partition_count": 6,
+        "connected_components": [
+          2,
+          2,
+          2,
+          2,
+          2,
+          2
+        ],
+        "is_network_connected": false,
+        "coordinator_id": "SAT-07",
+        "is_leadership_unresolved": false,
+        "average_battery": 88.92,
+        "average_propellant": 78.58,
+        "satellite_states": {
+          "SAT-01": "NOMINAL",
+          "SAT-02": "NOMINAL",
+          "SAT-03": "NOMINAL",
+          "SAT-04": "NOMINAL",
+          "SAT-05": "NOMINAL",
+          "SAT-06": "NOMINAL",
+          "SAT-07": "NOMINAL",
+          "SAT-08": "NOMINAL",
+          "SAT-09": "NOMINAL",
+          "SAT-10": "NOMINAL",
+          "SAT-11": "NOMINAL",
+          "SAT-12": "NOMINAL"
+        }
+      },
+      "faulted_metrics": {
+        "sim_time_sec": 2.0,
+        "nominal_count": 11,
+        "degraded_count": 1,
+        "failed_count": 0,
+        "isolated_count": 0,
+        "active_links_count": 6,
+        "partition_count": 6,
+        "connected_components": [
+          2,
+          2,
+          2,
+          2,
+          2,
+          2
+        ],
+        "is_network_connected": false,
+        "coordinator_id": "SAT-07",
+        "is_leadership_unresolved": false,
+        "average_battery": 88.92,
+        "average_propellant": 78.58,
+        "satellite_states": {
+          "SAT-01": "DEGRADED",
+          "SAT-02": "NOMINAL",
+          "SAT-03": "NOMINAL",
+          "SAT-04": "NOMINAL",
+          "SAT-05": "NOMINAL",
+          "SAT-06": "NOMINAL",
+          "SAT-07": "NOMINAL",
+          "SAT-08": "NOMINAL",
+          "SAT-09": "NOMINAL",
+          "SAT-10": "NOMINAL",
+          "SAT-11": "NOMINAL",
+          "SAT-12": "NOMINAL"
+        }
+      },
+      "final_metrics": {
+        "sim_time_sec": 12.0,
+        "nominal_count": 12,
+        "degraded_count": 0,
+        "failed_count": 0,
+        "isolated_count": 0,
+        "active_links_count": 6,
+        "partition_count": 6,
+        "connected_components": [
+          2,
+          2,
+          2,
+          2,
+          2,
+          2
+        ],
+        "is_network_connected": false,
+        "coordinator_id": "SAT-07",
+        "is_leadership_unresolved": false,
+        "average_battery": 88.92,
+        "average_propellant": 78.58,
+        "satellite_states": {
+          "SAT-01": "NOMINAL",
+          "SAT-02": "NOMINAL",
+          "SAT-03": "NOMINAL",
+          "SAT-04": "NOMINAL",
+          "SAT-05": "NOMINAL",
+          "SAT-06": "NOMINAL",
+          "SAT-07": "NOMINAL",
+          "SAT-08": "NOMINAL",
+          "SAT-09": "NOMINAL",
+          "SAT-10": "NOMINAL",
+          "SAT-11": "NOMINAL",
+          "SAT-12": "NOMINAL"
+        }
+      },
+      "detection_delays": {
+        "SAT-01": 0.5
+      },
+      "recovery_times": {
+        "SAT-01": 3.5
+      },
+      "faults_injected_count": 1,
+      "autonomous_events_count": 3,
+      "role_reassignments": [],
+      "completed_recoveries": [
+        {
+          "satelliteId": "SAT-01",
+          "timestamp": 5.5,
+          "message": "SAT-01 compute watchdog reset successful: flight software restored to NOMINAL"
+        }
+      ],
+      "remaining_unrecoverable": [],
+      "timeline": [
+        {
+          "step": 0,
+          "simTimeSec": 0.0,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 1,
+          "simTimeSec": 0.5,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 2,
+          "simTimeSec": 1.0,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 3,
+          "simTimeSec": 1.5,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 4,
+          "simTimeSec": 2.0,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 5,
+          "simTimeSec": 2.5,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": [
+            "Local peer observation confirmed anomaly for SAT-01 (single-peer check; no multi-peer consensus; simulated telemetry inspection)",
+            "SAT-01 entered RECOVERING: initiated RESET_COMPUTE (est. 3.0s sim time)"
+          ]
+        },
+        {
+          "step": 6,
+          "simTimeSec": 3.0,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 7,
+          "simTimeSec": 3.5,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 8,
+          "simTimeSec": 4.0,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 9,
+          "simTimeSec": 4.5,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 10,
+          "simTimeSec": 5.0,
+          "nominal": 11,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 11,
+          "simTimeSec": 5.5,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": [
+            "SAT-01 compute watchdog reset successful: flight software restored to NOMINAL"
+          ]
+        },
+        {
+          "step": 12,
+          "simTimeSec": 6.0,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 13,
+          "simTimeSec": 6.5,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 14,
+          "simTimeSec": 7.0,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 15,
+          "simTimeSec": 7.5,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 16,
+          "simTimeSec": 8.0,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 17,
+          "simTimeSec": 8.5,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 18,
+          "simTimeSec": 9.0,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 19,
+          "simTimeSec": 9.5,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 20,
+          "simTimeSec": 10.0,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 21,
+          "simTimeSec": 10.5,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 22,
+          "simTimeSec": 11.0,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 23,
+          "simTimeSec": 11.5,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        },
+        {
+          "step": 24,
+          "simTimeSec": 12.0,
+          "nominal": 12,
+          "failed": 0,
+          "coordinatorId": "SAT-07",
+          "activeLinks": 6,
+          "events": []
+        }
+      ],
+      "acceptance_checks": [
+        {
+          "name": "Initial Invariant: Nominal Count",
+          "passed": true,
+          "details": "All 12 satellites nominal at t=0",
+          "expected": null,
+          "actual": null
+        },
+        {
+          "name": "Initial Invariant: Coordinator",
+          "passed": true,
+          "details": "Bootstrap coordinator verified as SAT-07 at t=0 (pre-failure swarm initialization)",
+          "expected": null,
+          "actual": null
+        },
+        {
+          "name": "Scheduled Fault Execution",
+          "passed": true,
+          "details": "All 1 scheduled fault injections executed at specified simulation timestamps",
+          "expected": null,
+          "actual": null
+        },
+        {
+          "name": "Autonomous Detection Delay",
+          "passed": true,
+          "details": "All fault detections completed within threshold (1.0s max)",
+          "expected": null,
+          "actual": null
+        },
+        {
+          "name": "Autonomous Recovery (SAT-01 RESET_COMPUTE)",
+          "passed": true,
+          "details": "Recovery task for SAT-01 completed successfully via RESET_COMPUTE",
+          "expected": null,
+          "actual": null
+        },
+        {
+          "name": "Final Nominal Satellites",
+          "passed": true,
+          "details": "Final nominal count: 12 >= threshold 12",
+          "expected": 12,
           "actual": 12
         },
         {
