@@ -13,17 +13,11 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, stat
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from backend.app.services.external_feeds import get_live_context
 
 from backend.app.core.swarm import SwarmOrchestrator
 from backend.app.schemas.telemetry import (
     TelemetryFrameSchema,
     MissionEventSchema,
-)
-from backend.app.services.external_mission_context import (
-    create_observation_task,
-    get_live_context,
-    get_observation_tasks,
 )
 from backend.app.services.external_mission_context import (
     create_observation_task,
@@ -306,14 +300,55 @@ def run_scenario_endpoint(scenario_id: str) -> Dict[str, Any]:
 
 @app.get("/api/external/live-context")
 def get_external_live_context() -> Dict[str, Any]:
-    """
-    Retrieve current public mission-context data from NASA and USGS.
-
-    This endpoint does not represent telemetry from the simulated ASTRANET
-    spacecraft. It supplies environmental and disaster context that the
-    swarm may use for mission planning and visualization.
-    """
+    """Retrieve current NASA EONET and USGS mission-context data."""
     return get_live_context()
+
+
+@app.post("/api/mission/observation-task")
+def plan_observation_task(
+    cmd: ObservationTaskRequest,
+) -> Dict[str, Any]:
+    """Plan a simulated observation mission from a real-world event."""
+    try:
+        return create_observation_task(
+            orchestrator,
+            cmd.model_dump(),
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(exc),
+        )
+
+
+@app.post("/api/mission/observation-task/{task_id}/execute")
+def execute_planned_observation(
+    task_id: str,
+) -> Dict[str, Any]:
+    """Execute a planned digital-twin Earth-observation task."""
+    try:
+        return execute_observation_task(
+            orchestrator,
+            task_id,
+        )
+    except KeyError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(exc),
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(exc),
+        )
+
+
+@app.get("/api/mission/observation-tasks")
+def list_observation_tasks() -> List[Dict[str, Any]]:
+    """Return current simulated observation-task lifecycle states."""
+    return get_observation_tasks(
+        orchestrator
+    )
 
 
 # ============================================================================

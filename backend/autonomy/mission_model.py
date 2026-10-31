@@ -92,6 +92,14 @@ class SwarmMissionModel:
 
         failed_nodes = sum(1 for s in satellites if s.state == SatelliteState.FAILED)
 
+        # Multiple geometric connected components are normal for this orbital
+        # architecture. Treat topology as mission-degraded only when relay
+        # capability has actually been lost.
+        topology_degraded = (
+            partition_count > 1
+            and relay_ratio < 1.0
+        )
+
         # 4. Determine Mission Mode
         # - NOMINAL: >= 90% sensing & relay, connected network, coordinator healthy
         # - DEGRADED-A: All primary objectives preserved (e.g. lost 1-2 thrusters or 1 sensor, coverage >= 75%)
@@ -105,7 +113,7 @@ class SwarmMissionModel:
         elif failed_nodes >= 3 or coverage_ratio < cls.COVERAGE_DEGRADED_B_MIN or coordinator_status == "FAILOVER_REQUIRED":
             mode = MissionMode.SURVIVAL
             primary_met = False
-        elif coverage_ratio < cls.COVERAGE_DEGRADED_A_MIN or relay_ratio < cls.RELAY_DEGRADED_A_MIN or partition_count > 1:
+        elif coverage_ratio < cls.COVERAGE_DEGRADED_A_MIN or relay_ratio < cls.RELAY_DEGRADED_A_MIN or topology_degraded:
             mode = MissionMode.DEGRADED_B
             primary_met = True  # Degraded but primary payload still delivered
         elif coverage_ratio < cls.COVERAGE_NOMINAL_MIN or relay_ratio < cls.RELAY_NOMINAL_MIN or maneuver_ratio < 1.0 or failed_nodes > 0:
@@ -125,9 +133,13 @@ class SwarmMissionModel:
         else:  # BALANCED
             mission_score = (coverage_ratio * 35.0) + (relay_ratio * 30.0) + (compute_ratio * 20.0) + (maneuver_ratio * 15.0)
 
-        # Scale by network penalty if partitioned
-        if partition_count > 1:
-            mission_score *= max(0.6, 1.0 - (partition_count - 1) * 0.15)
+        # Penalize topology only when fragmentation accompanies actual
+        # loss of relay capability. Normal orbital visibility gaps are expected.
+        if topology_degraded:
+            mission_score *= max(
+                0.6,
+                1.0 - (partition_count - 1) * 0.15,
+            )
 
         return SwarmMissionReport(
             timestamp_sec=sim_time_sec,
