@@ -2,8 +2,9 @@ import {
   SatelliteTelemetry,
   SatelliteState,
   SubsystemStatus,
+  RecoveryDecision,
 } from "../../data/mockMissionControl";
-import { AlertTriangle, RotateCcw } from "lucide-react";
+import { AlertTriangle, RotateCcw, Trophy } from "lucide-react";
 import Satellite3DPreview from "./Satellite3DPreview";
 
 interface SelectedSatelliteRightPanelProps {
@@ -11,6 +12,8 @@ interface SelectedSatelliteRightPanelProps {
   onOpenFaultModal: () => void;
   onResetSwarm: () => void;
   isAnyFaultActive: boolean;
+  latestDecision?: RecoveryDecision | null;
+  onOpenTournament?: () => void;
 }
 
 export default function SelectedSatelliteRightPanel({
@@ -18,6 +21,8 @@ export default function SelectedSatelliteRightPanel({
   onOpenFaultModal,
   onResetSwarm,
   isAnyFaultActive,
+  latestDecision,
+  onOpenTournament,
 }: SelectedSatelliteRightPanelProps) {
   const getSubsystemStatusClass = (status: SubsystemStatus) => {
     switch (status) {
@@ -167,6 +172,27 @@ export default function SelectedSatelliteRightPanel({
           <p className="text-xs text-[#F3F6F8]/85 leading-relaxed">
             {satellite.autonomyStatus}
           </p>
+
+          {/* Active Tournament Decision Notice for this satellite */}
+          {latestDecision && latestDecision.targetSatelliteId === satellite.id && onOpenTournament && (
+            <div className="mt-2 p-2.5 rounded-lg bg-cyan-950/40 border border-cyan-500/30 flex items-center justify-between">
+              <div>
+                <div className="text-[10px] font-medium text-cyan-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <Trophy className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Recovery Plan Ready</span>
+                </div>
+                <div className="text-[10px] text-[#AAB7C4] mt-0.5">
+                  Plan: {latestDecision.selectedPlanId}
+                </div>
+              </div>
+              <button
+                onClick={onOpenTournament}
+                className="px-2 py-1 rounded bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-[10px] font-medium text-cyan-300 transition-colors cursor-pointer"
+              >
+                Inspect
+              </button>
+            </div>
+          )}
         </div>
         {/* SECTION 5: Satellite Profile */}
         <div className="space-y-3 pt-2">

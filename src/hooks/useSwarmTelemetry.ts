@@ -14,6 +14,7 @@ import {
   SwarmClock,
   SwarmSummary,
   TelemetryFrame,
+  RecoveryDecision,
   FailureType,
   FailureSeverity,
   INITIAL_SATELLITES,
@@ -27,6 +28,7 @@ export interface UseSwarmTelemetryReturn {
   networkMetrics: NetworkSummary | null;
   clock: SwarmClock | null;
   swarmSummary: SwarmSummary | null;
+  latestDecision: RecoveryDecision | null;
   isConnected: boolean;
   isReconnecting: boolean;
   isPaused: boolean;
@@ -43,6 +45,7 @@ export interface UseSwarmTelemetryReturn {
   resetSimulation: () => Promise<boolean>;
   stepSimulation: (dt?: number) => Promise<boolean>;
   setWarpFactor: (warpFactor: number) => Promise<boolean>;
+  triggerRecovery: () => Promise<boolean>;
 }
 
 export function useSwarmTelemetry(): UseSwarmTelemetryReturn {
@@ -58,6 +61,7 @@ export function useSwarmTelemetry(): UseSwarmTelemetryReturn {
   const [networkMetrics, setNetworkMetrics] = useState<NetworkSummary | null>(null);
   const [clock, setClock] = useState<SwarmClock | null>(null);
   const [swarmSummary, setSwarmSummary] = useState<SwarmSummary | null>(null);
+  const [latestDecision, setLatestDecision] = useState<RecoveryDecision | null>(null);
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isReconnecting, setIsReconnecting] = useState<boolean>(false);
   const [isPaused, setIsPaused] = useState<boolean>(false);
@@ -108,6 +112,9 @@ export function useSwarmTelemetry(): UseSwarmTelemetryReturn {
             }
             if (frame.swarmSummary) {
               setSwarmSummary(frame.swarmSummary);
+            }
+            if (frame.latestDecision) {
+              setLatestDecision(frame.latestDecision);
             }
             setClock(frame.clock);
             setIsPaused(Boolean(frame.clock.isPaused));
@@ -241,6 +248,9 @@ export function useSwarmTelemetry(): UseSwarmTelemetryReturn {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ initialElapsedSec: 0.0 }),
       });
+      if (response.ok) {
+        setLatestDecision(null);
+      }
       return response.ok;
     } catch {
       return false;
@@ -279,6 +289,18 @@ export function useSwarmTelemetry(): UseSwarmTelemetryReturn {
     [apiBaseUrl]
   );
 
+  const triggerRecovery = useCallback(async (): Promise<boolean> => {
+    try {
+      const response = await fetch(`${apiBaseUrl}/api/autonomy/trigger-recovery`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+      return response.ok;
+    } catch {
+      return false;
+    }
+  }, [apiBaseUrl]);
+
   return {
     satellites,
     events,
@@ -286,6 +308,7 @@ export function useSwarmTelemetry(): UseSwarmTelemetryReturn {
     networkMetrics,
     clock,
     swarmSummary,
+    latestDecision,
     isConnected,
     isReconnecting,
     isPaused,
@@ -297,5 +320,6 @@ export function useSwarmTelemetry(): UseSwarmTelemetryReturn {
     resetSimulation,
     stepSimulation,
     setWarpFactor,
+    triggerRecovery,
   };
 }

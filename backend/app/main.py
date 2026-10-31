@@ -241,6 +241,42 @@ def get_events() -> List[Dict[str, Any]]:
 
 
 # ============================================================================
+# AUTONOMY, RESILIENCE & DECISION ENGINE ENDPOINTS (Zahid Ownership)
+# ============================================================================
+
+@app.get("/api/autonomy/diagnostics")
+def get_diagnostics() -> List[Dict[str, Any]]:
+    """Retrieve history of all fault attribution and diagnostic reports."""
+    return [d.to_dict() for d in reversed(orchestrator.fault_attributor.history[-10:])]
+
+
+@app.get("/api/autonomy/trust")
+def get_trust_scores() -> Dict[str, Any]:
+    """Retrieve constellation Byzantine trust records and quarantine statuses."""
+    return orchestrator.trust_manager.get_all_records()
+
+
+@app.get("/api/autonomy/tournament")
+def get_tournament_decision() -> Optional[Dict[str, Any]]:
+    """Retrieve latest counterfactual recovery tournament decision and candidate scorecard."""
+    if orchestrator.latest_decision:
+        return orchestrator.latest_decision.to_dict()
+    return None
+
+
+@app.post("/api/autonomy/trigger-recovery")
+def trigger_recovery_execution() -> Dict[str, Any]:
+    """Execute the tournament-winning RecoveryPlan on the constellation and report outcome."""
+    success, msg, metrics = orchestrator.execute_latest_recovery_plan()
+    return {
+        "success": success,
+        "message": msg,
+        "metrics": metrics,
+        "currentMissionState": orchestrator.get_telemetry_frame()["swarmSummary"]["missionState"],
+    }
+
+
+# ============================================================================
 # PHASE 6 SCENARIOS BENCHMARK ENDPOINTS
 # ============================================================================
 

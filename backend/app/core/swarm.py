@@ -20,6 +20,11 @@ from backend.app.core.faults import FaultEngine, FaultEvent, FailureType, Failur
 from backend.app.core.recovery import RecoveryEngine, RecoveryEvent
 from backend.autonomy.diagnosis import FaultAttributor
 from backend.autonomy.mission_model import SwarmMissionModel
+from backend.autonomy.trust import TrustManager
+from backend.autonomy.consensus import ConsensusEngine
+from backend.recovery.tournament import RecoveryTournamentEngine
+from backend.recovery.orchestration import RecoveryPlanExecutor
+from backend.recovery.contracts import RecoveryDecision, RecoveryPlan
 
 
 # Canonical Constellation Planes matching ASTRANET architecture
@@ -81,6 +86,11 @@ class SwarmOrchestrator:
         self.recovery_engine: RecoveryEngine = RecoveryEngine()
         self.fault_attributor: FaultAttributor = FaultAttributor()
         self.mission_model: SwarmMissionModel = SwarmMissionModel()
+        self.trust_manager: TrustManager = TrustManager()
+        self.consensus_engine: ConsensusEngine = ConsensusEngine(trust_manager=self.trust_manager)
+        self.tournament_engine: RecoveryTournamentEngine = RecoveryTournamentEngine()
+        self._latest_decision: Optional[RecoveryDecision] = None
+        self._latest_plan: Optional[RecoveryPlan] = None
 
         self._satellites_map: Dict[str, CubeSat] = {}
         self._satellites_list: List[CubeSat] = []
@@ -207,8 +217,13 @@ class SwarmOrchestrator:
         self.network.update(self._satellites_list)
         self._sync_network_neighbors()
 
-        # Phase 1 Autonomy: Probabilistic fault diagnosis and swarm mission impact update
-        self.fault_attributor.diagnose_satellite(
+        # Phase 1 & 2 Autonomy: Fault diagnosis & Peer Consensus
+        self.consensus_engine.verify_anomaly_with_peers(
+            target=sat,
+            satellites=self._satellites_list,
+            network=self.network,
+        )
+        diag = self.fault_attributor.diagnose_satellite(
             satellite=sat,
             network=self.network,
             sim_time_sec=self.clock.elapsed_seconds,
@@ -220,7 +235,52 @@ class SwarmOrchestrator:
             sim_time_sec=self.clock.elapsed_seconds,
         )
 
+        # Phase 3 to 5 Autonomy: Counterfactual Recovery Tournament
+        decision, plan = self.tournament_engine.run_tournament(
+            target=sat,
+            diagnosis=diag,
+            satellites=self._satellites_list,
+            network=self.network,
+            sim_time_sec=self.clock.elapsed_seconds,
+            mission_state_before=sat.mission_state,
+        )
+        self._latest_decision = decision
+        self._latest_plan = plan
+
         return event
+
+    @property
+    def latest_decision(self) -> Optional[RecoveryDecision]:
+        """Most recent counterfactual tournament decision."""
+        return self._latest_decision
+
+    @property
+    def latest_plan(self) -> Optional[RecoveryPlan]:
+        """Most recent executable recovery plan."""
+        return self._latest_plan
+
+    def execute_latest_recovery_plan(self) -> Tuple[bool, str, Dict[str, Any]]:
+        """Dispatch and apply the latest tournament-selected RecoveryPlan to constellation state."""
+        if not self._latest_plan:
+            return False, "No active recovery plan available", {}
+
+        success, msg, metrics = RecoveryPlanExecutor.execute_plan(
+            plan=self._latest_plan,
+            satellites=self._satellites_list,
+            network=self.network,
+        )
+        SwarmMissionModel.sync_mission_state(
+            satellites=self._satellites_list,
+            network=self.network,
+            sim_time_sec=self.clock.elapsed_seconds,
+        )
+        self.recovery_engine._record_event(
+            sim_time_sec=self.clock.elapsed_seconds,
+            satellite_id=self._latest_plan.target_satellite_id,
+            message=msg,
+            severity="nominal" if success else "warning",
+        )
+        return success, msg, metrics
 
     def step(self, dt: Optional[float] = None) -> float:
         """Advance the master clock, orbital kinematics, and dynamic network topology in lockstep.
@@ -267,6 +327,8 @@ class SwarmOrchestrator:
         self.clock.reset(initial_elapsed_sec=initial_elapsed_sec)
         self.fault_engine.clear()
         self.recovery_engine.clear()
+        self._latest_decision = None
+        self._latest_plan = None
         self._initialize_swarm()
 
     def get_telemetry_frame(self) -> Dict[str, Any]:
@@ -306,6 +368,7 @@ class SwarmOrchestrator:
             "links": self.network.get_active_links(),
             "network": self.network.to_dict(),
             "events": [ev.to_dict() for ev in reversed(all_events[-10:])],
+            "latestDecision": self._latest_decision.to_dict() if self._latest_decision else None,
             "swarmSummary": {
                 "total": self.satellite_count,
                 "nominal": nominal_count,

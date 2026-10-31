@@ -19,6 +19,13 @@ from backend.autonomy.contracts import (
 from backend.autonomy.capability import CapabilityGraph
 from backend.autonomy.diagnosis import FaultAttributor
 from backend.autonomy.mission_model import SwarmMissionModel
+from backend.autonomy.trust import TrustManager, TrustRecord
+from backend.autonomy.consensus import (
+    ConsensusEngine,
+    PeerVote,
+    PeerConsensusResult,
+    ElectionResult,
+)
 
 __all__ = [
     "CapabilityType",
@@ -33,4 +40,10 @@ __all__ = [
     "CapabilityGraph",
     "FaultAttributor",
     "SwarmMissionModel",
+    "TrustManager",
+    "TrustRecord",
+    "ConsensusEngine",
+    "PeerVote",
+    "PeerConsensusResult",
+    "ElectionResult",
 ]

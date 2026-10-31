@@ -13,7 +13,8 @@ import SelectedSatelliteRightPanel from "./SelectedSatelliteRightPanel";
 import MetricsBottomBar from "./MetricsBottomBar";
 import FaultInjectionModal from "./FaultInjectionModal";
 import LiveGlobeHUD from "./LiveGlobeHUD";
-import { Search, ArrowLeft } from "lucide-react";
+import RecoveryTournamentModal from "./RecoveryTournamentModal";
+import { Search, ArrowLeft, Trophy } from "lucide-react";
 
 interface MissionControlDashboardProps {
   onExit: () => void;
@@ -29,6 +30,7 @@ export default function MissionControlDashboard({
     networkMetrics,
     clock,
     swarmSummary,
+    latestDecision,
     links,
     isConnected,
     isReconnecting,
@@ -38,6 +40,7 @@ export default function MissionControlDashboard({
     resetSimulation: backendResetSimulation,
     pauseSimulation,
     resumeSimulation,
+    triggerRecovery,
   } = useSwarmTelemetry();
 
   // Selection & Navigation State
@@ -45,6 +48,7 @@ export default function MissionControlDashboard({
   const [activeNavTab, setActiveNavTab] = useState<string>("Live Globe");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isFaultModalOpen, setIsFaultModalOpen] = useState<boolean>(false);
+  const [isTournamentModalOpen, setIsTournamentModalOpen] = useState<boolean>(false);
 
   // Fallback Simulation Clock (T+ 00:14:32 counter) for standalone mode
   const [simSeconds, setSimSeconds] = useState<number>(872);
@@ -96,6 +100,9 @@ export default function MissionControlDashboard({
         throw new Error(res.error || "Fault injection rejected by simulation engine.");
       }
       setSelectedSatelliteId(targetId);
+      setTimeout(() => {
+        setIsTournamentModalOpen(true);
+      }, 700);
       return;
     }
 
@@ -200,6 +207,18 @@ export default function MissionControlDashboard({
             />
           </div>
 
+          {/* Recovery Decision Ready Button */}
+          {latestDecision && (
+            <button
+              onClick={() => setIsTournamentModalOpen(true)}
+              title="Open Counterfactual Autonomy Recovery Tournament"
+              className="px-2.5 py-1 rounded-md bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/35 text-xs text-cyan-300 font-medium transition-colors cursor-pointer flex items-center gap-1.5 animate-pulse"
+            >
+              <Trophy className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Recovery Decision</span>
+            </button>
+          )}
+
           {/* Pause / Resume simulation control */}
           {isConnected && (
             <button
@@ -275,15 +294,18 @@ export default function MissionControlDashboard({
             networkMetrics={networkMetrics}
             swarmSummary={swarmSummary}
             isConnected={isConnected}
+            onOpenTournament={() => setIsTournamentModalOpen(true)}
           />
         </main>
 
         {/* CLEAN RIGHT SELECTED SATELLITE PANEL (320px) */}
         <SelectedSatelliteRightPanel
           satellite={selectedSatellite}
-          onOpenFaultModal={() => setIsFaultModalOpen(false || true)}
+          onOpenFaultModal={() => setIsFaultModalOpen(true)}
           onResetSwarm={handleResetSwarm}
           isAnyFaultActive={isAnyFaultActive}
+          latestDecision={latestDecision}
+          onOpenTournament={() => setIsTournamentModalOpen(true)}
         />
       </div>
 
@@ -306,6 +328,16 @@ export default function MissionControlDashboard({
         onClose={() => setIsFaultModalOpen(false)}
         satellites={satellites}
         onInject={handleInjectFault}
+      />
+
+      {/* =========================================================================
+          COUNTERFACTUAL RECOVERY TOURNAMENT MODAL
+          ========================================================================= */}
+      <RecoveryTournamentModal
+        isOpen={isTournamentModalOpen}
+        onClose={() => setIsTournamentModalOpen(false)}
+        decision={latestDecision}
+        onExecuteRecovery={triggerRecovery}
       />
     </div>
   );

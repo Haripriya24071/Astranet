@@ -5,6 +5,7 @@ import {
   Radio,
   Satellite,
   ShieldCheck,
+  Trophy,
 } from "lucide-react";
 
 import type {
@@ -20,6 +21,7 @@ interface LiveGlobeHUDProps {
   networkMetrics: NetworkSummary | null;
   swarmSummary: SwarmSummary | null;
   isConnected: boolean;
+  onOpenTournament?: () => void;
 }
 
 function clamp(value: number, min: number, max: number) {
@@ -32,6 +34,7 @@ export default function LiveGlobeHUD({
   networkMetrics,
   swarmSummary,
   isConnected,
+  onOpenTournament,
 }: LiveGlobeHUDProps) {
   const total = swarmSummary?.total ?? satellites.length;
 
@@ -260,7 +263,7 @@ export default function LiveGlobeHUD({
       </div>
 
       {activeRecovery && (
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[560px] max-w-[calc(100%-40px)]">
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[560px] max-w-[calc(100%-40px)] pointer-events-auto">
           <div className="border border-amber-300/15 bg-[#090D12]/94 backdrop-blur-xl rounded-lg overflow-hidden shadow-2xl shadow-black/40">
             <div className="h-[2px] bg-amber-400/70" />
 
@@ -279,9 +282,21 @@ export default function LiveGlobeHUD({
                 </div>
               </div>
 
-              <div className="flex items-center gap-1.5 text-[10px] text-[#AAB7C4]">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                SELF-HEAL
+              <div className="flex items-center gap-2">
+                {onOpenTournament && (
+                  <button
+                    onClick={onOpenTournament}
+                    className="px-2.5 py-1 rounded bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/30 text-cyan-300 text-[10px] font-medium transition-colors cursor-pointer flex items-center gap-1.5"
+                    title="View counterfactual recovery tournament"
+                  >
+                    <Trophy className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>View Tournament</span>
+                  </button>
+                )}
+                <div className="flex items-center gap-1.5 text-[10px] text-[#AAB7C4]">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                  SELF-HEAL
+                </div>
               </div>
             </div>
 

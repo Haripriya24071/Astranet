@@ -139,3 +139,4 @@ class TelemetryFrameSchema(BaseModel):
     network: NetworkSummarySchema
     events: List[MissionEventSchema]
     swarmSummary: SwarmSummarySchema
+    latestDecision: Optional[Dict[str, Any]] = None

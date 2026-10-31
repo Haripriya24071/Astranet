@@ -85,6 +85,43 @@ export interface SwarmSummary {
   missionState: string;
 }
 
+export interface RecoveryAction {
+  actionType: string;
+  targetSatelliteId: string;
+  parameters: Record<string, any>;
+  description: string;
+}
+
+export interface RecoveryCandidate {
+  planId: string;
+  name: string;
+  actions: RecoveryAction[];
+  expectedMissionUtility: number;
+  deltaVCostMs: number;
+  energyCostPct: number;
+  risk: number;
+  recoveryConfidence: number;
+  predictedSecondaryRisk: number;
+  resilienceDebt: number;
+  n1Survival: number;
+  n2Survival: number;
+  compositeScore: number;
+}
+
+export interface RecoveryDecision {
+  selectedPlanId: string;
+  targetSatelliteId: string;
+  timestampSec: number;
+  triggeringAnomaly: string;
+  ranking: string[];
+  candidates: RecoveryCandidate[];
+  evidence: string[];
+  rejectedPlansWithReasons: Record<string, string>;
+  rationale: string;
+  missionStateBefore: string;
+  missionStateAfter: string;
+}
+
 export interface TelemetryFrame {
   clock: SwarmClock;
   satellites: SatelliteTelemetry[];
@@ -92,6 +129,7 @@ export interface TelemetryFrame {
   network: NetworkSummary;
   events: MissionEvent[];
   swarmSummary: SwarmSummary;
+  latestDecision?: RecoveryDecision;
 }
 
 export interface SatelliteTelemetry {
