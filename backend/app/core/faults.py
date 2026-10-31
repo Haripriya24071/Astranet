@@ -189,7 +189,11 @@ class FaultEngine:
             satellite.subsystems.attitudeControl = SubsystemStatus.WARNING
             satellite.state = SatelliteState.WARNING
 
-        # 2. Update status and anomaly tags
+        # 2. Synchronize functional capabilities via CapabilityGraph
+        from backend.autonomy.capability import CapabilityGraph
+        CapabilityGraph.sync_satellite(satellite)
+
+        # 3. Update status and anomaly tags
         satellite.last_anomaly = f"{failure_type.value} ({severity.value})"
         satellite.autonomy_status = f"Fault isolated: {failure_type.value} ({severity.value})"
         satellite.mission_state = "DEGRADED" if satellite.state == SatelliteState.FAILED else "INVESTIGATING"

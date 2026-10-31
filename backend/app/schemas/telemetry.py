@@ -127,6 +127,8 @@ class SwarmSummarySchema(BaseModel):
     coordinatorId: str
     missionCode: str
     missionState: str
+    missionScore: Optional[float] = None
+    coverageRatio: Optional[float] = None
 
 
 class RecoveryTaskTelemetrySchema(BaseModel):
