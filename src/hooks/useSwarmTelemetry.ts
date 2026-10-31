@@ -48,6 +48,16 @@ export interface UseSwarmTelemetryReturn {
   stepSimulation: (dt?: number) => Promise<boolean>;
   setWarpFactor: (warpFactor: number) => Promise<boolean>;
   triggerRecovery: () => Promise<boolean>;
+  // Mission Black Box Flight Recorder
+  historyFrames: TelemetryFrame[];
+  scrubIndex: number | null;
+  isScrubbing: boolean;
+  isBlackBoxPlaying: boolean;
+  scrubTo: (index: number | null) => void;
+  togglePlayback: () => void;
+  jumpToAnomaly: () => void;
+  jumpToDecision: () => void;
+  jumpToLive: () => void;
 }
 
 export function useSwarmTelemetry(): UseSwarmTelemetryReturn {
@@ -70,10 +80,92 @@ export function useSwarmTelemetry(): UseSwarmTelemetryReturn {
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Mission Black Box Ring Buffer
+  const historyBufferRef = useRef<TelemetryFrame[]>([]);
+  const [historyFrames, setHistoryFrames] = useState<TelemetryFrame[]>([]);
+  const [scrubIndex, setScrubIndex] = useState<number | null>(null);
+  const [isBlackBoxPlaying, setIsBlackBoxPlaying] = useState<boolean>(false);
+
   const socketRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<number | null>(null);
   const retryCountRef = useRef<number>(0);
   const isMountedRef = useRef<boolean>(true);
+
+  // Apply scrubbed frame to displayed states
+  useEffect(() => {
+    if (scrubIndex === null) return;
+    const historical = historyBufferRef.current[scrubIndex];
+    if (!historical) return;
+
+    setSatellites(historical.satellites);
+    if (Array.isArray(historical.events)) setEvents(historical.events);
+    if (Array.isArray(historical.links)) setLinks(historical.links);
+    if (historical.network) setNetworkMetrics(historical.network);
+    if (historical.swarmSummary) setSwarmSummary(historical.swarmSummary);
+    setLatestDecision(historical.latestDecision || null);
+    setAutonomy(historical.autonomy || null);
+    setClock(historical.clock);
+  }, [scrubIndex]);
+
+  // Handle Black Box playback loop
+  useEffect(() => {
+    if (!isBlackBoxPlaying || scrubIndex === null) return;
+    const interval = setInterval(() => {
+      setScrubIndex((prev) => {
+        if (prev === null) return null;
+        if (prev >= historyBufferRef.current.length - 1) {
+          setIsBlackBoxPlaying(false);
+          return null;
+        }
+        return prev + 1;
+      });
+    }, 150);
+    return () => clearInterval(interval);
+  }, [isBlackBoxPlaying, scrubIndex]);
+
+  const scrubTo = useCallback((index: number | null) => {
+    setHistoryFrames([...historyBufferRef.current]);
+    setScrubIndex(index);
+    if (index === null) {
+      setIsBlackBoxPlaying(false);
+    }
+  }, []);
+
+  const togglePlayback = useCallback(() => {
+    if (scrubIndex === null) {
+      const startIdx = Math.max(0, historyBufferRef.current.length - 30);
+      setScrubIndex(startIdx);
+      setIsBlackBoxPlaying(true);
+    } else {
+      setIsBlackBoxPlaying((p) => !p);
+    }
+  }, [scrubIndex]);
+
+  const jumpToAnomaly = useCallback(() => {
+    setHistoryFrames([...historyBufferRef.current]);
+    const idx = historyBufferRef.current.findIndex((f) =>
+      f.satellites.some((s) => s.state !== "NOMINAL") ||
+      (f.events && f.events.some((e) => e.type === "FAULT" || e.severity === "critical"))
+    );
+    if (idx !== -1) {
+      setScrubIndex(idx);
+      setIsBlackBoxPlaying(false);
+    }
+  }, []);
+
+  const jumpToDecision = useCallback(() => {
+    setHistoryFrames([...historyBufferRef.current]);
+    const idx = historyBufferRef.current.findIndex((f) => Boolean(f.latestDecision));
+    if (idx !== -1) {
+      setScrubIndex(idx);
+      setIsBlackBoxPlaying(false);
+    }
+  }, []);
+
+  const jumpToLive = useCallback(() => {
+    setScrubIndex(null);
+    setIsBlackBoxPlaying(false);
+  }, []);
 
   const connectWebSocket = useCallback(() => {
     if (!isMountedRef.current) return;
@@ -103,27 +195,37 @@ export function useSwarmTelemetry(): UseSwarmTelemetryReturn {
 
           // Validate frame integrity
           if (frame && Array.isArray(frame.satellites) && frame.clock) {
-            setSatellites(frame.satellites);
-            if (Array.isArray(frame.events)) {
-              setEvents(frame.events);
+            historyBufferRef.current.push(frame);
+            if (historyBufferRef.current.length > 120) {
+              historyBufferRef.current.shift();
             }
-            if (Array.isArray(frame.links)) {
-              setLinks(frame.links);
+            if (historyBufferRef.current.length % 10 === 0 || historyBufferRef.current.length < 15) {
+              setHistoryFrames([...historyBufferRef.current]);
             }
-            if (frame.network) {
-              setNetworkMetrics(frame.network);
+
+            if (scrubIndex === null) {
+              setSatellites(frame.satellites);
+              if (Array.isArray(frame.events)) {
+                setEvents(frame.events);
+              }
+              if (Array.isArray(frame.links)) {
+                setLinks(frame.links);
+              }
+              if (frame.network) {
+                setNetworkMetrics(frame.network);
+              }
+              if (frame.swarmSummary) {
+                setSwarmSummary(frame.swarmSummary);
+              }
+              if (frame.latestDecision) {
+                setLatestDecision(frame.latestDecision);
+              }
+              if (frame.autonomy) {
+                setAutonomy(frame.autonomy);
+              }
+              setClock(frame.clock);
+              setIsPaused(Boolean(frame.clock.isPaused));
             }
-            if (frame.swarmSummary) {
-              setSwarmSummary(frame.swarmSummary);
-            }
-            if (frame.latestDecision) {
-              setLatestDecision(frame.latestDecision);
-            }
-            if (frame.autonomy) {
-              setAutonomy(frame.autonomy);
-            }
-            setClock(frame.clock);
-            setIsPaused(Boolean(frame.clock.isPaused));
           }
         } catch (err) {
           console.warn("ASTRANET: Failed to parse incoming telemetry frame", err);
@@ -338,5 +440,14 @@ export function useSwarmTelemetry(): UseSwarmTelemetryReturn {
     stepSimulation,
     setWarpFactor,
     triggerRecovery,
+    historyFrames,
+    scrubIndex,
+    isScrubbing: scrubIndex !== null,
+    isBlackBoxPlaying,
+    scrubTo,
+    togglePlayback,
+    jumpToAnomaly,
+    jumpToDecision,
+    jumpToLive,
   };
 }

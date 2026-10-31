@@ -18,6 +18,8 @@ import ScenarioSimulationPanel from "./ScenarioSimulationPanel";
 import MissionDataPanel from "./MissionDataPanel";
 import MissionContextPanel from "./MissionContextPanel";
 import IntelligencePanel from "./IntelligencePanel";
+import BlackBoxScrubber from "./BlackBoxScrubber";
+import type { RecoveryCandidate, BlastRadiusResult } from "../../data/mockMissionControl";
 import { Search, ArrowLeft, Trophy } from "lucide-react";
 
 interface MissionControlDashboardProps {
@@ -47,6 +49,15 @@ export default function MissionControlDashboard({
     pauseSimulation,
     resumeSimulation,
     triggerRecovery,
+    historyFrames,
+    scrubIndex,
+    isScrubbing,
+    isBlackBoxPlaying,
+    scrubTo,
+    togglePlayback,
+    jumpToAnomaly,
+    jumpToDecision,
+    jumpToLive,
   } = useSwarmTelemetry();
 
   // Selection & Navigation State
@@ -57,6 +68,20 @@ export default function MissionControlDashboard({
   const [isTournamentModalOpen, setIsTournamentModalOpen] = useState<boolean>(false);
   const [globeMode, setGlobeMode] = useState<GlobeMode>("SWARM");
   const [showMissionHud, setShowMissionHud] = useState<boolean>(false);
+  const [previewGhostCandidate, setPreviewGhostCandidate] = useState<RecoveryCandidate | null>(null);
+  const [blastRadiusData, setBlastRadiusData] = useState<BlastRadiusResult | null>(null);
+
+  const handleSimulateBlastRadius = async (satelliteId: string) => {
+    try {
+      const res = await fetch(`${apiBaseUrl}/api/autonomy/blast-radius/${satelliteId}`);
+      if (res.ok) {
+        const data: BlastRadiusResult = await res.json();
+        setBlastRadiusData(data);
+      }
+    } catch (err) {
+      console.warn("ASTRANET: Failed to simulate blast radius", err);
+    }
+  };
 
   // Fallback Simulation Clock (T+ 00:14:32 counter) for standalone mode
   const [simSeconds, setSimSeconds] = useState<number>(872);
@@ -322,6 +347,8 @@ export default function MissionControlDashboard({
                 activeLinks={links}
                 apiBaseUrl={apiBaseUrl}
                 onModeChange={setGlobeMode}
+                ghostCandidate={previewGhostCandidate}
+                blastRadiusData={blastRadiusData}
               />
 
               <button
@@ -360,8 +387,26 @@ export default function MissionControlDashboard({
           isAnyFaultActive={isAnyFaultActive}
           latestDecision={latestDecision}
           onOpenTournament={() => setIsTournamentModalOpen(true)}
+          blastRadiusData={blastRadiusData}
+          onSimulateBlastRadius={handleSimulateBlastRadius}
+          onClearBlastRadius={() => setBlastRadiusData(null)}
         />
       </div>
+
+      {/* =========================================================================
+          MISSION BLACK BOX (INTERACTIVE TIME-TRAVEL FLIGHT RECORDER SCRUBBER)
+          ========================================================================= */}
+      <BlackBoxScrubber
+        historyFrames={historyFrames}
+        scrubIndex={scrubIndex}
+        isScrubbing={isScrubbing}
+        isBlackBoxPlaying={isBlackBoxPlaying}
+        onScrubTo={scrubTo}
+        onTogglePlayback={togglePlayback}
+        onJumpToAnomaly={jumpToAnomaly}
+        onJumpToDecision={jumpToDecision}
+        onJumpToLive={jumpToLive}
+      />
 
       {/* =========================================================================
           RESTRAINED BOTTOM SUMMARY STRIP
@@ -389,9 +434,13 @@ export default function MissionControlDashboard({
           ========================================================================= */}
       <RecoveryTournamentModal
         isOpen={isTournamentModalOpen}
-        onClose={() => setIsTournamentModalOpen(false)}
+        onClose={() => {
+          setIsTournamentModalOpen(false);
+          setPreviewGhostCandidate(null);
+        }}
         decision={latestDecision}
         onExecuteRecovery={triggerRecovery}
+        onHoverCandidate={setPreviewGhostCandidate}
       />
     </div>
   );

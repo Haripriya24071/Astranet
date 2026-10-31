@@ -134,6 +134,40 @@ export interface RecoveryTaskTelemetry {
   details: Record<string, unknown>;
 }
 
+export interface BlastRadiusPeer {
+  satelliteId: string;
+  name: string;
+  role: string;
+  state: string;
+  battery: number;
+  currentLinks: number;
+  postFailureLinks: number;
+  projectedLoadSurgePct: number;
+  impactStatus: string;
+}
+
+export interface BlastRadiusResult {
+  targetSatelliteId: string;
+  targetName: string;
+  targetRole: string;
+  severity: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+  riskScore: number;
+  severedLinksCount: number;
+  severedLinks: Array<[string, string]>;
+  affectedPeersCount: number;
+  affectedPeers: BlastRadiusPeer[];
+  partitionRisk: boolean;
+  islandsCreated: number;
+  blindspot: {
+    centerLat: number;
+    centerLng: number;
+    radiusKm: number;
+    region: string;
+    description: string;
+  };
+  autonomousMitigation: string;
+}
+
 export interface AutonomySummary {
   engineStatus:
     | "MONITORING"

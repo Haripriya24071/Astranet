@@ -296,6 +296,18 @@ def trigger_recovery_execution() -> Dict[str, Any]:
     }
 
 
+@app.get("/api/autonomy/blast-radius/{satellite_id}")
+def get_satellite_blast_radius(satellite_id: str) -> Dict[str, Any]:
+    """Calculate the N-1 cascading blast radius for a given satellite."""
+    from backend.autonomy.blast_radius import calculate_blast_radius
+    try:
+        return calculate_blast_radius(orchestrator, satellite_id)
+    except KeyError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+
 # ============================================================================
 # PHASE 6 SCENARIOS BENCHMARK ENDPOINTS
 # ============================================================================

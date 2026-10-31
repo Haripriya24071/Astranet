@@ -3,8 +3,9 @@ import {
   SatelliteState,
   SubsystemStatus,
   RecoveryDecision,
+  BlastRadiusResult,
 } from "../../data/mockMissionControl";
-import { AlertTriangle, RotateCcw, Trophy } from "lucide-react";
+import { AlertTriangle, RotateCcw, Trophy, Zap, ShieldAlert, X } from "lucide-react";
 import Satellite3DPreview from "./Satellite3DPreview";
 
 interface SelectedSatelliteRightPanelProps {
@@ -14,6 +15,9 @@ interface SelectedSatelliteRightPanelProps {
   isAnyFaultActive: boolean;
   latestDecision?: RecoveryDecision | null;
   onOpenTournament?: () => void;
+  blastRadiusData?: BlastRadiusResult | null;
+  onSimulateBlastRadius?: (satId: string) => void;
+  onClearBlastRadius?: () => void;
 }
 
 export default function SelectedSatelliteRightPanel({
@@ -23,6 +27,9 @@ export default function SelectedSatelliteRightPanel({
   isAnyFaultActive,
   latestDecision,
   onOpenTournament,
+  blastRadiusData,
+  onSimulateBlastRadius,
+  onClearBlastRadius,
 }: SelectedSatelliteRightPanelProps) {
   const getSubsystemStatusClass = (status: SubsystemStatus) => {
     switch (status) {
@@ -297,13 +304,96 @@ export default function SelectedSatelliteRightPanel({
           </div>
         </div>
 
+        {/* N-1 CASCADING BLAST RADIUS DOMINO IMPACT CARD */}
+        {blastRadiusData && blastRadiusData.targetSatelliteId === satellite.id && (
+          <div className="p-3.5 rounded-xl border border-rose-500/40 bg-rose-950/20 backdrop-blur-md space-y-3 animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between pb-2 border-b border-rose-500/20">
+              <div className="flex items-center gap-1.5 text-rose-400 font-medium text-xs">
+                <ShieldAlert className="w-4 h-4 text-rose-400 animate-pulse" />
+                <span>N-1 Domino Cascade</span>
+              </div>
+              <button
+                onClick={onClearBlastRadius}
+                title="Dismiss blast radius projection"
+                className="p-1 rounded text-gray-400 hover:text-white transition-colors cursor-pointer"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            <div className="flex items-center justify-between text-[11px]">
+              <span className="text-gray-400">Predicted Risk:</span>
+              <span className="font-mono font-bold text-rose-400">
+                {blastRadiusData.riskScore}% ({blastRadiusData.severity})
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between text-[11px]">
+              <span className="text-gray-400">Severed Links:</span>
+              <span className="font-mono text-white">
+                {blastRadiusData.severedLinksCount} ISL channels
+              </span>
+            </div>
+
+            <div className="space-y-1">
+              <div className="text-[10px] text-gray-400 uppercase tracking-wider">
+                Domino Impact Peers ({blastRadiusData.affectedPeersCount}):
+              </div>
+              <div className="space-y-1 max-h-24 overflow-y-auto">
+                {blastRadiusData.affectedPeers.map((p) => (
+                  <div
+                    key={p.satelliteId}
+                    className="flex items-center justify-between p-1.5 rounded bg-black/40 text-[10px] border border-white/5"
+                  >
+                    <span className="font-mono text-cyan-300">{p.satelliteId}</span>
+                    <span className="text-amber-400 font-mono">
+                      +{p.projectedLoadSurgePct}% load
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="p-2 rounded bg-black/40 border border-white/5 text-[10px] space-y-1">
+              <div className="text-gray-400">Sensor Blindspot:</div>
+              <div className="text-white font-medium">{blastRadiusData.blindspot.region}</div>
+              <div className="text-gray-500 font-mono text-[9px]">
+                Radius: {blastRadiusData.blindspot.radiusKm} km ground coverage
+              </div>
+            </div>
+
+            <div className="p-2 rounded bg-rose-500/10 border border-rose-500/20 text-[10px] text-rose-200 leading-relaxed">
+              <span className="font-semibold text-rose-300">Mitigation: </span>
+              {blastRadiusData.autonomousMitigation}
+            </div>
+          </div>
+        )}
+
       </div>
 
-      {/* Action Footer: Inject Fault & Reset buttons */}
+      {/* Action Footer: Blast Radius, Inject Fault & Reset buttons */}
       <div className="pt-6 border-t border-white/6 space-y-2 mt-6">
+        {blastRadiusData && blastRadiusData.targetSatelliteId === satellite.id ? (
+          <button
+            onClick={onClearBlastRadius}
+            className="w-full py-2 px-3 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/35 text-xs text-rose-300 flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+          >
+            <X className="w-3.5 h-3.5" />
+            <span>Clear Blast Simulation</span>
+          </button>
+        ) : (
+          <button
+            onClick={() => onSimulateBlastRadius?.(satellite.id)}
+            className="w-full py-2.5 px-4 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 hover:border-rose-500/50 text-xs font-medium text-rose-300 flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-sm shadow-rose-950/20"
+          >
+            <Zap className="w-3.5 h-3.5 text-rose-400" />
+            <span>Simulate Blast Radius (N-1)</span>
+          </button>
+        )}
+
         <button
           onClick={onOpenFaultModal}
-          className="w-full py-2.5 px-4 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-xs font-medium text-white flex items-center justify-center gap-2 transition-colors cursor-pointer"
+          className="w-full py-2 px-4 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-xs font-medium text-white flex items-center justify-center gap-2 transition-colors cursor-pointer"
         >
           <AlertTriangle className="w-3.5 h-3.5 text-[#F59E0B]" />
           <span>Inject Fault</span>

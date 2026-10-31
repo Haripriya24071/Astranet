@@ -18,6 +18,7 @@ interface RecoveryTournamentModalProps {
   onClose: () => void;
   decision: RecoveryDecision | null;
   onExecuteRecovery: () => Promise<boolean>;
+  onHoverCandidate?: (candidate: any) => void;
 }
 
 export default function RecoveryTournamentModal({
@@ -25,6 +26,7 @@ export default function RecoveryTournamentModal({
   onClose,
   decision,
   onExecuteRecovery,
+  onHoverCandidate,
 }: RecoveryTournamentModalProps) {
   const [isExecuting, setIsExecuting] = useState(false);
   const [executionStatus, setExecutionStatus] = useState<string | null>(null);
@@ -137,10 +139,12 @@ export default function RecoveryTournamentModal({
                 return (
                   <div
                     key={cand.planId}
-                    className={`p-3.5 rounded-lg border flex flex-col justify-between transition-all ${
+                    onMouseEnter={() => onHoverCandidate?.(cand)}
+                    onMouseLeave={() => onHoverCandidate?.(null)}
+                    className={`p-3.5 rounded-lg border flex flex-col justify-between transition-all cursor-pointer ${
                       isSelected
                         ? "bg-cyan-950/20 border-cyan-400/50 shadow-lg shadow-cyan-950/20"
-                        : "bg-white/[0.02] border-white/8 hover:border-white/20"
+                        : "bg-white/[0.02] border-white/8 hover:border-cyan-500/40 hover:bg-cyan-950/10"
                     }`}
                   >
                     <div>
@@ -156,8 +160,11 @@ export default function RecoveryTournamentModal({
                           {cand.compositeScore.toFixed(1)}
                         </span>
                       </div>
-                      <div className="font-medium text-white text-xs mb-3">
+                      <div className="font-medium text-white text-xs mb-1">
                         {cand.name}
+                      </div>
+                      <div className="text-[9px] text-cyan-400/80 font-mono mb-2.5 flex items-center gap-1">
+                        <span>👻</span> 3D Multiverse Ghost
                       </div>
 
                       {/* Key scorecard metrics */}

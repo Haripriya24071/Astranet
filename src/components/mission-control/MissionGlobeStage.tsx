@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
-
+import { useState, useEffect } from "react";
 import type {
   SatelliteTelemetry,
+  RecoveryCandidate,
+  BlastRadiusResult,
 } from "../../data/mockMissionControl";
 
 import CesiumGlobe from "./CesiumGlobe";
@@ -18,6 +19,8 @@ interface MissionGlobeStageProps {
   activeLinks?: Array<[string, string]>;
   apiBaseUrl: string;
   onModeChange?: (mode: GlobeMode) => void;
+  ghostCandidate?: RecoveryCandidate | null;
+  blastRadiusData?: BlastRadiusResult | null;
 }
 
 export default function MissionGlobeStage({
@@ -29,12 +32,21 @@ export default function MissionGlobeStage({
   activeLinks,
   apiBaseUrl,
   onModeChange,
+  ghostCandidate,
+  blastRadiusData,
 }: MissionGlobeStageProps) {
   const [mode, setMode] = useState<GlobeMode>("SWARM");
 
   useEffect(() => {
     onModeChange?.(mode);
   }, [mode, onModeChange]);
+
+  // Auto-switch to ORBITAL mode when multiverse ghosting or blast radius preview is triggered
+  useEffect(() => {
+    if (ghostCandidate || blastRadiusData) {
+      setMode("ORBITAL");
+    }
+  }, [ghostCandidate, blastRadiusData]);
 
   return (
     <div className="relative w-full h-full">
@@ -55,6 +67,8 @@ export default function MissionGlobeStage({
           missionTime={missionTime}
           coordinatorId={coordinatorId}
           activeLinks={activeLinks}
+          ghostCandidate={ghostCandidate}
+          blastRadiusData={blastRadiusData}
         />
       )}
 

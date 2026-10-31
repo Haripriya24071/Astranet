@@ -2,7 +2,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as Cesium from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import { Focus, RotateCcw, ZoomIn, ZoomOut } from "lucide-react";
-import type { SatelliteState, SatelliteTelemetry } from "../../data/mockMissionControl";
+import type {
+  SatelliteState,
+  SatelliteTelemetry,
+  RecoveryCandidate,
+  BlastRadiusResult,
+} from "../../data/mockMissionControl";
 
 export type ViewMode = "ORBIT" | "NETWORK" | "MISSION";
 
@@ -13,6 +18,8 @@ interface CesiumGlobeProps {
   missionTime: string;
   coordinatorId: string;
   activeLinks?: Array<[string, string]>;
+  ghostCandidate?: RecoveryCandidate | null;
+  blastRadiusData?: BlastRadiusResult | null;
 }
 
 type PlaneConfig = {
@@ -128,6 +135,8 @@ export default function CesiumGlobe({
   missionTime,
   coordinatorId,
   activeLinks,
+  ghostCandidate,
+  blastRadiusData,
 }: CesiumGlobeProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const creditRef = useRef<HTMLDivElement>(null);
@@ -466,6 +475,217 @@ export default function CesiumGlobe({
       viewerRef.current = null;
     };
   }, [coordinatorId, getSatellitePosition, onSelectSatellite, satelliteIcon]);
+
+  // =========================================================================
+  // MULTIVERSE GHOSTING (Parallel Future Visualizer in 3D Cesium)
+  // =========================================================================
+  useEffect(() => {
+    const viewer = viewerRef.current;
+    if (!viewer || viewer.isDestroyed() || !isReady) return;
+
+    // Clean up old ghost entities
+    const oldGhosts = viewer.entities.values.filter((e) => e.id.startsWith("ghost:"));
+    for (const g of oldGhosts) {
+      viewer.entities.remove(g);
+    }
+
+    if (!ghostCandidate) return;
+
+    // Pick ghost color based on candidate plan
+    let ghostColor = Cesium.Color.fromCssColorString("#06B6D4");
+    if (ghostCandidate.planId.includes("BETA") || ghostCandidate.planId.includes("PLAN-02")) {
+      ghostColor = Cesium.Color.fromCssColorString("#F59E0B");
+    } else if (ghostCandidate.planId.includes("GAMMA") || ghostCandidate.planId.includes("PLAN-03")) {
+      ghostColor = Cesium.Color.fromCssColorString("#EC4899");
+    }
+
+    // Determine target satellite
+    const targetAction = ghostCandidate.actions[0];
+    const targetSatId = targetAction?.targetSatelliteId || selectedSatelliteId;
+    const targetSat = satellites.find((s) => s.id === targetSatId);
+
+    if (targetSat) {
+      const basePos = getSatellitePosition(targetSat);
+      // Project parallel future trajectory offset (+160 km radial)
+      const norm = Cesium.Cartesian3.normalize(basePos, new Cesium.Cartesian3());
+      const ghostOffset = Cesium.Cartesian3.multiplyByScalar(norm, 160_000, new Cesium.Cartesian3());
+      const ghostPos = Cesium.Cartesian3.add(basePos, ghostOffset, new Cesium.Cartesian3());
+
+      // 1. Ghost Sphere Marker
+      viewer.entities.add({
+        id: `ghost:marker-${ghostCandidate.planId}`,
+        position: ghostPos,
+        ellipsoid: {
+          radii: new Cesium.Cartesian3(45_000, 45_000, 45_000),
+          material: ghostColor.withAlpha(0.35),
+          outline: true,
+          outlineColor: ghostColor.withAlpha(0.9),
+          outlineWidth: 2,
+        },
+        label: {
+          text: `👻 MULTIVERSE: ${ghostCandidate.name}\nUtility: +${Math.round(ghostCandidate.expectedMissionUtility)}% | Risk: ${Math.round(ghostCandidate.risk * 100)}%`,
+          font: "bold 11px 'JetBrains Mono', monospace",
+          fillColor: ghostColor,
+          outlineColor: Cesium.Color.fromCssColorString("#05080D"),
+          outlineWidth: 4,
+          style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+          pixelOffset: new Cesium.Cartesian2(0, -38),
+        },
+      });
+
+      // 2. Ghost Trajectory Drift Vector Line
+      viewer.entities.add({
+        id: `ghost:drift-${ghostCandidate.planId}`,
+        polyline: {
+          positions: [basePos, ghostPos],
+          width: 3,
+          material: new Cesium.PolylineDashMaterialProperty({
+            color: ghostColor.withAlpha(0.85),
+            dashLength: 16.0,
+          }),
+          arcType: Cesium.ArcType.NONE,
+        },
+      });
+
+      // 3. Ghost Laser Crosslink if action specifies rerouting peer
+      const reroutePeerId = (targetAction?.parameters as any)?.reroute_via || (targetAction?.parameters as any)?.target_coordinator_id;
+      if (reroutePeerId) {
+        const peerSat = satellites.find((s) => s.id === reroutePeerId);
+        if (peerSat) {
+          const peerPos = getSatellitePosition(peerSat);
+          viewer.entities.add({
+            id: `ghost:link-${reroutePeerId}`,
+            polyline: {
+              positions: [ghostPos, peerPos],
+              width: 2.5,
+              material: new Cesium.PolylineGlowMaterialProperty({
+                glowPower: 0.25,
+                color: ghostColor,
+              }),
+              arcType: Cesium.ArcType.NONE,
+            },
+          });
+        }
+      }
+    }
+  }, [ghostCandidate, isReady, satellites, selectedSatelliteId, getSatellitePosition]);
+
+  // =========================================================================
+  // CASCADING BLAST RADIUS (N-1 Domino Risk Halo in 3D Cesium)
+  // =========================================================================
+  useEffect(() => {
+    const viewer = viewerRef.current;
+    if (!viewer || viewer.isDestroyed() || !isReady) return;
+
+    // Clean up old blast entities
+    const oldBlast = viewer.entities.values.filter((e) => e.id.startsWith("blast:"));
+    for (const b of oldBlast) {
+      viewer.entities.remove(b);
+    }
+
+    if (!blastRadiusData) return;
+
+    const targetSat = satellites.find((s) => s.id === blastRadiusData.targetSatelliteId);
+    if (targetSat) {
+      const targetPos = getSatellitePosition(targetSat);
+
+      // 1. Danger Pulsing Halo Dome around target satellite
+      viewer.entities.add({
+        id: "blast:target-halo",
+        position: targetPos,
+        ellipsoid: {
+          radii: new Cesium.Cartesian3(120_000, 120_000, 120_000),
+          material: Cesium.Color.fromCssColorString("#EF4444").withAlpha(0.22),
+          outline: true,
+          outlineColor: Cesium.Color.fromCssColorString("#F43F5E").withAlpha(0.9),
+          outlineWidth: 3,
+        },
+        label: {
+          text: `🚨 N-1 CASUALTY: ${blastRadiusData.targetSatelliteId}\nRisk: ${blastRadiusData.riskScore}% (${blastRadiusData.severity})`,
+          font: "bold 11px 'JetBrains Mono', monospace",
+          fillColor: Cesium.Color.fromCssColorString("#FCA5A5"),
+          outlineColor: Cesium.Color.fromCssColorString("#450A0A"),
+          outlineWidth: 4,
+          style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+          pixelOffset: new Cesium.Cartesian2(0, -42),
+        },
+      });
+
+      // 2. Severed Links (dashed crimson laser lines)
+      blastRadiusData.severedLinks.forEach(([u, v], idx) => {
+        const satA = satellites.find((s) => s.id === u);
+        const satB = satellites.find((s) => s.id === v);
+        if (satA && satB) {
+          viewer.entities.add({
+            id: `blast:severed-${idx}`,
+            polyline: {
+              positions: [getSatellitePosition(satA), getSatellitePosition(satB)],
+              width: 3.5,
+              material: new Cesium.PolylineDashMaterialProperty({
+                color: Cesium.Color.fromCssColorString("#EF4444"),
+                dashLength: 12.0,
+              }),
+              arcType: Cesium.ArcType.NONE,
+            },
+          });
+        }
+      });
+
+      // 3. Domino Impact Peers (Amber Alert rings)
+      blastRadiusData.affectedPeers.forEach((peer) => {
+        const peerSat = satellites.find((s) => s.id === peer.satelliteId);
+        if (peerSat) {
+          const peerPos = getSatellitePosition(peerSat);
+          viewer.entities.add({
+            id: `blast:peer-${peer.satelliteId}`,
+            position: peerPos,
+            ellipsoid: {
+              radii: new Cesium.Cartesian3(70_000, 70_000, 70_000),
+              material: Cesium.Color.fromCssColorString("#F59E0B").withAlpha(0.18),
+              outline: true,
+              outlineColor: Cesium.Color.fromCssColorString("#FBBF24").withAlpha(0.85),
+              outlineWidth: 2,
+            },
+            label: {
+              text: `⚠️ DOMINO PEER: ${peer.satelliteId}\n+${peer.projectedLoadSurgePct}% Traffic Surge`,
+              font: "500 10px 'JetBrains Mono', monospace",
+              fillColor: Cesium.Color.fromCssColorString("#FDE68A"),
+              outlineColor: Cesium.Color.fromCssColorString("#05080D"),
+              outlineWidth: 3,
+              style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+              pixelOffset: new Cesium.Cartesian2(0, 32),
+            },
+          });
+        }
+      });
+
+      // 4. Ground Observation Footprint Blindspot Circle
+      if (blastRadiusData.blindspot) {
+        const bs = blastRadiusData.blindspot;
+        viewer.entities.add({
+          id: "blast:blindspot-ground",
+          position: Cesium.Cartesian3.fromDegrees(bs.centerLng, bs.centerLat, 0),
+          ellipse: {
+            semiMajorAxis: bs.radiusKm * 1000,
+            semiMinorAxis: bs.radiusKm * 1000,
+            material: Cesium.Color.fromCssColorString("#EF4444").withAlpha(0.12),
+            outline: true,
+            outlineColor: Cesium.Color.fromCssColorString("#F87171").withAlpha(0.65),
+            height: 0,
+          },
+          label: {
+            text: `SENSOR BLINDSPOT: ${bs.region}`,
+            font: "600 11px Inter, sans-serif",
+            fillColor: Cesium.Color.fromCssColorString("#FCA5A5"),
+            outlineColor: Cesium.Color.fromCssColorString("#05080D"),
+            outlineWidth: 3,
+            style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+            pixelOffset: new Cesium.Cartesian2(0, -18),
+          },
+        });
+      }
+    }
+  }, [blastRadiusData, isReady, satellites, getSatellitePosition]);
 
   const focusSelected = () => {
     const viewer = viewerRef.current;
