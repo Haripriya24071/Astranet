@@ -1,1 +1,0 @@
-"""ASTRANET Data Contracts."""

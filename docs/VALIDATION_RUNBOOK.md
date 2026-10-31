@@ -10,7 +10,7 @@
 Ensure Python 3.11+ (or 3.14) is available. Install the required test dependencies:
 
 ```bash
-pip install -r astranet/requirements-test.txt
+pip install -r requirements-test.txt
 pip install fastapi httpx networkx numpy uvicorn websockets
 ```
 
