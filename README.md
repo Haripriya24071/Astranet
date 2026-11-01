@@ -1,4 +1,4 @@
-# ASTRANET 🛰️
+# ASTRANET
 
 ### Autonomous Self-Healing CubeSat Swarm Mission-Resilience Platform
 
@@ -14,7 +14,7 @@
 
 ---
 
-## 🌌 Overview
+## Overview
 
 **ASTRANET** is a next-generation research and mission-resilience platform for autonomous CubeSat constellations and satellite swarms.
 
@@ -29,30 +29,30 @@ Traditional space mission management treats a spacecraft as simply **alive** or 
 
 ---
 
-## 🎯 Key Architectural Innovations
+## Key Architectural Innovations
 
-### 1. 🔄 Capability-Centric Failure Modeling
+### 1. Capability-Centric Failure Modeling
 Spacecraft are not binary nodes. When a thruster valve sticks, the satellite loses active orbital station-keeping, but its optical sensor, inter-satellite laser relay, and flight computer remain healthy. ASTRANET reassigns roles dynamically rather than decommissioning the spacecraft.
 
-### 2. 🏆 Autonomous Strategy Tournament & Pareto Optimization
+### 2. Autonomous Strategy Tournament & Pareto Optimization
 When a complex anomaly occurs, ASTRANET's recovery engine generates multiple candidate futures (role failover, laser link rerouting, orbital drift phasing, and selective load shedding). It conducts an autonomous strategy tournament, stress-testing each candidate using Monte Carlo methods against secondary failures to rank strategies across a multi-objective Pareto front.
 
-### 3. 👻 Multiverse Ghosting
+### 3. Multiverse Ghosting
 Directly visualized in the 3D CesiumJS globe stage: mission operators can inspect "ghost" orbital trajectories and candidate network topographies representing alternative simulated futures before automated consensus executes them.
 
-### 4. 💥 Cascading Blast Radius ($N-1$ Predictive Analysis)
+### 4. Cascading Blast Radius ($N-1$ Predictive Analysis)
 Computes real-time topological vulnerability graphs across inter-satellite crosslinks (ISL). Operators can visualize the downstream cascading impact across the swarm if an adjacent or transit node drops.
 
-### 5. 📼 Mission Black Box Flight Recorder
+### 5. Mission Black Box Flight Recorder
 A full telemetry recorder that allows scrubbing backward and forward through mission time, adjusting playback dilation, and reviewing post-mortem consensus decisions and subsystem health states.
 
-### 6. 🛡️ Byzantine Fault Tolerance & Dynamic Trust
+### 6. Byzantine Fault Tolerance & Dynamic Trust
 Maintains a decentralized consensus quorum across the constellation. Byzantine or compromised nodes broadcasting inconsistent ephemeris or corrupted telemetry are penalized via continuous trust scoring and quarantined from swarm decision-making.
 
-### 7. 🧠 Predictive Health Intelligence & TinyML Anomaly Detection
+### 7. Predictive Health Intelligence & TinyML Anomaly Detection
 Multi-variate telemetry isolation engines evaluate thermal, power bus impedance, thruster pressure, and optical SNR to attribute probabilistic root-cause hypotheses with Bayesian evidence trails.
 
-### 8. 🌐 Real Multi-Constellation SGP4 Propagation
+### 8. Real Multi-Constellation SGP4 Propagation
 Features live Two-Line Element (TLE) tracking and real-time SGP4 orbital mechanics for real constellations:
 - **Starlink** (SpaceX)
 - **OneWeb** (Eutelsat)
@@ -63,7 +63,7 @@ Features live Two-Line Element (TLE) tracking and real-time SGP4 orbital mechani
 
 ---
 
-## 🛠️ Complete Technology Stack
+## Complete Technology Stack
 
 | Layer | Technologies & Libraries | Purpose |
 | :--- | :--- | :--- |
@@ -82,27 +82,32 @@ Features live Two-Line Element (TLE) tracking and real-time SGP4 orbital mechani
 
 ---
 
-## ⚡ The 12-Step Autonomous Resilience Pipeline
+## The 12-Step Autonomous Resilience Pipeline
 
 ```mermaid
-flowchart TD
-    A[1. OBSERVE<br/>10Hz Subsystem & ISL Telemetry] --> B[2. SUSPECT<br/>TinyML Threshold & Residual Trigger]
-    B --> C[3. VERIFY<br/>Peer Cross-Check & Consensus Ping]
-    C --> D[4. DIAGNOSE<br/>Bayesian Fault Attribution]
-    D --> E[5. ASSESS MISSION IMPACT<br/>Capability Loss & Blast Radius N-1]
-    E --> F[6. GENERATE FUTURES<br/>Candidate Recovery Permutations]
-    F --> G[7. SIMULATE<br/>Digital-Twin Fast-Forward]
-    G --> H[8. STRESS-TEST<br/>Monte Carlo Stochastic Perturbations]
-    H --> I[9. RANK<br/>Pareto Multi-Objective Optimization]
-    I --> J[10. EXPLAIN<br/>Operator Justification & Log]
-    J --> K[11. EXECUTE<br/>Quorum-Signed Constellation Command]
-    K --> L[12. LEARN<br/>Constellation Knowledge Base Update]
-    L -.-> A
+flowchart LR
+    subgraph S1["Phase 1: Detection & Diagnosis"]
+        direction LR
+        A["1. OBSERVE<br/>10Hz Telemetry"] --> B["2. SUSPECT<br/>TinyML Trigger"] --> C["3. VERIFY<br/>Peer Check"] --> D["4. DIAGNOSE<br/>Fault Attribution"]
+    end
+
+    subgraph S2["Phase 2: Impact & Future Generation"]
+        direction LR
+        E["5. ASSESS<br/>Blast Radius N-1"] --> F["6. GENERATE<br/>Recovery Futures"] --> G["7. SIMULATE<br/>Digital-Twin"] --> H["8. STRESS-TEST<br/>Monte Carlo"]
+    end
+
+    subgraph S3["Phase 3: Arbitration & Execution"]
+        direction LR
+        I["9. RANK<br/>Pareto Selection"] --> J["10. EXPLAIN<br/>Mission Rationale"] --> K["11. EXECUTE<br/>Quorum Command"] --> L["12. LEARN<br/>Knowledge Update"]
+    end
+
+    S1 --> S2 --> S3
+    S3 -. Continuous Loop .-> S1
 ```
 
 ---
 
-## 🧪 Benchmark Scenarios Catalog
+## Benchmark Scenarios Catalog
 
 ASTRANET includes 10 canonical scenarios in [`backend/scenarios/`](backend/scenarios/) designed for deterministic validation of constellation autonomy:
 
@@ -121,7 +126,7 @@ ASTRANET includes 10 canonical scenarios in [`backend/scenarios/`](backend/scena
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -196,7 +201,7 @@ python backend/collect_real_constellations.py
 
 ---
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```text
 Astranet/
@@ -235,17 +240,16 @@ Astranet/
 
 ---
 
-## 👥 Team — Ctrl Freaks
+## Team — Ctrl Freaks
 
 | Member | Focus Area | Primary Responsibilities |
 | :--- | :--- | :--- |
-| **Hari** ([@Haripriya24071](https://github.com/Haripriya24071)) | **Simulation & Digital-Twin** | Physics engine, SGP4 orbital propagation, dynamic ISL graph, FastAPI telemetry server |
+| **Hari** ([@Haripriya24071](https://github.com/Haripriya24071)) | **Simulation, Autonomy & Recovery Backend** | Physics engine, SGP4 orbital propagation, dynamic ISL graph, FastAPI telemetry server, capability modeling, Pareto strategy tournament, consensus, and blast radius |
 | **Vaibhavi** ([@sreevaibhaviab-git](https://github.com/sreevaibhaviab-git)) | **Mission Control UI** | CesiumJS globe stage, Three.js 3D satellite inspector, Black Box scrubber, UX design |
-| **Zahid** | **Autonomy & Resilience Engine** | Capability modeling, Pareto strategy tournament, consensus, and blast radius |
 | **Rits** ([@mer-ritz](https://github.com/mer-ritz)) | **Scenarios, QA & Contracts** | Canonical benchmark scenarios, Pydantic data contracts, test suites & runbooks |
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the [MIT License](LICENSE) — see the LICENSE file for details.
