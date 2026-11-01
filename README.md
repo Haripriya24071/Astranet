@@ -14,75 +14,125 @@
 
 ---
 
-## Overview
+## Executive Summary
 
-**ASTRANET** is a next-generation research and mission-resilience platform for autonomous CubeSat constellations and satellite swarms.
+ASTRANET is an autonomous mission-resilience and digital-twin operations platform engineered for distributed CubeSat constellations and satellite swarms operating in Low Earth Orbit (LEO).
 
-Traditional space mission management treats a spacecraft as simply **alive** or **failed**. ASTRANET fundamentally shifts this paradigm: **it models each spacecraft as a composite bundle of capabilities** (imaging, relay, orbital maneuvering, distributed compute, and storage). When an anomaly strikes, ASTRANET reasons about:
-
-1. **What specific capability was lost?**
-2. **How does this loss ripple through the inter-satellite network (ISL) and mission objectives?**
-3. **What resources remain distributed across the rest of the constellation?**
-4. **Which multi-step recovery future maximizes both immediate mission yield and long-term constellation survivability?**
-
-> **"ASTRANET chooses the best future for the swarm, not just the fastest fix for the current failure."**
+Instead of treating spacecraft failures as binary death sentences requiring ground-operator intervention, ASTRANET shifts the paradigm: it models every spacecraft as an elastic bundle of operational capabilities, predicts multi-node cascading blast radii, simulates competing recovery futures in an onboard tournament, and converges on Pareto-optimal resilience strategies in real time.
 
 ---
 
-## Key Architectural Innovations
+## Problem Statement: The LEO Swarm Resilience Crisis
 
-### 1. Capability-Centric Failure Modeling
-Spacecraft are not binary nodes. When a thruster valve sticks, the satellite loses active orbital station-keeping, but its optical sensor, inter-satellite laser relay, and flight computer remain healthy. ASTRANET reassigns roles dynamically rather than decommissioning the spacecraft.
+As the space industry shifts from monolithic spacecraft to megaconstellations and distributed nanosatellite swarms, mission operations face critical structural bottlenecks:
 
-### 2. Autonomous Strategy Tournament & Pareto Optimization
-When a complex anomaly occurs, ASTRANET's recovery engine generates multiple candidate futures (role failover, laser link rerouting, orbital drift phasing, and selective load shedding). It conducts an autonomous strategy tournament, stress-testing each candidate using Monte Carlo methods against secondary failures to rank strategies across a multi-objective Pareto front.
+1. **High Subsystem Infant Mortality & Failure Rates in LEO**:
+   Small satellites and CubeSats utilize commercial off-the-shelf (COTS) components to minimize launch cost, resulting in historical failure rates exceeding 35-45%. Common anomalies include thruster valve leaks, reaction wheel saturation, battery bus degradation, single-event upsets (SEUs) in flight computers, and optical transceiver alignment burnouts.
 
-### 3. Multiverse Ghosting
-Directly visualized in the 3D CesiumJS globe stage: mission operators can inspect "ghost" orbital trajectories and candidate network topographies representing alternative simulated futures before automated consensus executes them.
+2. **The Ground-in-the-Loop Latency Bottleneck**:
+   Traditional satellite constellations rely on periodic ground station passes. In typical 90-minute orbital periods, spacecraft only maintain ground line-of-sight for 8-12 minutes per pass. When an anomaly occurs outside a contact window, 45 to 80 minutes of critical blackout elapse before ground controllers can diagnose the problem, during which localized failures cascade into constellation-wide disconnections.
 
-### 4. Cascading Blast Radius ($N-1$ Predictive Analysis)
-Computes real-time topological vulnerability graphs across inter-satellite crosslinks (ISL). Operators can visualize the downstream cascading impact across the swarm if an adjacent or transit node drops.
+3. **Rigid Binary Failure Classification (Alive vs. Dead)**:
+   Legacy flight operations categorize spacecraft as either fully operational or failed. When a satellite suffers a propulsion breakdown, it is frequently decommissioned and deorbited as space debris, discarding healthy multi-spectral cameras, optical laser links, high-throughput compute nodes, and massive onboard solid-state storage.
 
-### 5. Mission Black Box Flight Recorder
-A full telemetry recorder that allows scrubbing backward and forward through mission time, adjusting playback dilation, and reviewing post-mortem consensus decisions and subsystem health states.
+4. **Cascading Network Partitions in Dynamic ISL Meshes**:
+   Inter-Satellite Links (ISLs) form dynamic, high-speed optical crosslink topologies. The unexpected loss of a single key relay node can partition an entire orbital plane, isolating multiple downstream satellites from downlinking science data to Earth ground stations.
 
-### 6. Byzantine Fault Tolerance & Dynamic Trust
-Maintains a decentralized consensus quorum across the constellation. Byzantine or compromised nodes broadcasting inconsistent ephemeris or corrupted telemetry are penalized via continuous trust scoring and quarantined from swarm decision-making.
+5. **Adversarial & Byzantine Telemetry Desynchronization**:
+   In distributed autonomous formations, sensor drift, delayed ephemeris propagation, or compromised spacecraft can inject conflicting or corrupted state broadcasts. Without decentralized Byzantine fault tolerance, false alarms trigger erratic evasive maneuvers that waste precious propellant.
 
-### 7. Predictive Health Intelligence & TinyML Anomaly Detection
-Multi-variate telemetry isolation engines evaluate thermal, power bus impedance, thruster pressure, and optical SNR to attribute probabilistic root-cause hypotheses with Bayesian evidence trails.
+---
 
-### 8. Real Multi-Constellation SGP4 Propagation
-Features live Two-Line Element (TLE) tracking and real-time SGP4 orbital mechanics for real constellations:
-- **Starlink** (SpaceX)
-- **OneWeb** (Eutelsat)
-- **Iridium NEXT**
-- **Project Kuiper** (Amazon)
-- **Qianfan / Spacesail**
-- **Galileo** (GNSS)
+## Our Solution: The ASTRANET Paradigm
+
+ASTRANET introduces a closed-loop autonomous resilience architecture that operates onboard the swarm without relying on immediate ground station connectivity:
+
+1. **Capability-Centric Decomposition**:
+   ASTRANET models each spacecraft as a set of decoupled capabilities: `Sensing (Imaging)`, `Relaying (ISL Routing)`, `Maneuvering (RCS Propulsion)`, `Navigation (GNSS/Star Trackers)`, `Compute (Distributed OBC)`, and `Storage (Payload Buffer)`. If propulsion fails, active station-keeping is marked lost, but the spacecraft is autonomously preserved as an in-situ optical sensor and relay node.
+
+2. **Autonomous Recovery Strategy Tournament**:
+   Rather than executing static contingency scripts, ASTRANET's recovery engine dynamically generates a spectrum of candidate recovery futures (relay promotion, laser link rerouting, orbital drift phasing, and selective load shedding). It simulates each candidate forward in time, stress-tests them with Monte Carlo stochastic perturbations, and selects the Pareto-optimal strategy that balances immediate mission yield against long-term constellation survivability.
+
+3. **Byzantine Consensus & Continuous Trust Scoring**:
+   Constellation decisions are governed by a decentralized quorum. Peer spacecraft continuously cross-validate beacon heartbeats and orbital state vectors across inter-satellite links. Telemetry divergences degrade a node's trust score; if trust falls below critical thresholds, the adversarial or malfunctioning node is quarantined from voting without disrupting the swarm.
+
+4. **Predictive Health Intelligence & Root-Cause Attribution**:
+   Onboard multi-variate telemetry isolation engines evaluate thermal, power bus impedance, thruster chamber pressures, and optical SNR margins. Bayesian attribution models map observed telemetry anomalies back to root causes with quantified confidence ratings and transparent evidence trails.
+
+5. **Closed-Loop Earth Observation Integration**:
+   ASTRANET bridges orbital autonomy with real-world planetary events by continuously ingesting live feeds from NASA EONET and USGS. When natural disasters strike (wildfires, earthquakes, severe storms), the swarm autonomously re-plans task schedules, assigning the nearest capable spacecraft and computing dynamic relay paths to ensure rapid downlink.
+
+---
+
+## Complete Feature Matrix
+
+### 1. Planetary Visualization & Orbital Mechanics (CesiumJS 3D Earth)
+- **High-Precision WGS84 3D Globe**: Rendered with CesiumJS, featuring real-world terrain, photorealistic atmosphere, and dynamic day/night solar illumination.
+- **SGP4 Real-Time Orbit Propagation**: Accurate numerical propagation of Keplerian orbital elements across 3 inclined orbital planes with 12 CubeSats.
+- **Dynamic Optical Inter-Satellite Links (ISL)**: Visual line-of-sight laser crosslink rays showing real-time link quality, bit error rate, and throughput.
+- **Ground Station Visibility Cones**: Real-time ground station tracking (Svalbard, Kourou, Hartebeesthoek, Fairbanks, McMurdo) with minimum elevation mask cones and contact pass countdowns.
+- **Multi-Constellation Live Tracking**: Live Two-Line Element (TLE) tracking mode displaying live operational satellites from Starlink, OneWeb, Iridium NEXT, Project Kuiper, Qianfan, and Galileo constellations.
+
+### 2. High-Impact Signature Innovations
+- **Multiverse Ghosting**: Direct visual projection of alternative recovery futures on the 3D globe. Operators can observe "ghost" orbital trajectories and candidate network topographies representing competing strategies before automated consensus executes them.
+- **Cascading Blast Radius (N-1 Hazard Analysis)**: Real-time topological analysis of the ISL communication mesh. Highlights downstream node isolations and network partition risks if an adjacent node suffers unexpected failure.
+- **Mission Black Box Flight Recorder**: High-frequency telemetry flight recorder with full temporal scrubbing, millisecond time-dilation controls (0.5x, 1x, 2x, 5x, 10x), rewind/fast-forward playback, and key event markers for consensus and fault triggers.
+
+### 3. Spacecraft Interactive CAD Digital-Twin (Three.js 3D Inspector)
+- **Modular 3D CubeSat Explorer**: Full Three.js 3D model of a standard 3U/6U CubeSat with interactive raycasting.
+- **Clickable Subsystem Modules**:
+  - Triple-Junction GaAs Solar Photovoltaic Arrays
+  - Electrical Power Subsystem (EPS) & LiFePO4 Battery Bus
+  - Cold Gas Reaction Control Thruster (RCS) Manifold
+  - High-Precision Reaction Wheels & ADCS Sensors
+  - Radiation-Tolerant Onboard Flight Computer (OBC)
+  - S-Band / X-Band Patch Antennas & Optical Laser Crosslink Transceivers
+  - Multi-Spectral Optical Earth Observation Payload
+- **Real-Time Subsystem Telemetry**: Live telemetry readouts for bus voltage, subsystem temperatures, propellant mass, CPU load, and health state.
+
+### 4. Autonomy Engine & Strategy Tournament
+- **Candidate Strategy Generator**: Automatically generates candidate solutions during anomalies, including dynamic relay handover, optical link rerouting, orbital phasing drift, and emergency load shedding.
+- **Monte Carlo Stress Testing**: Perturbs each candidate strategy with secondary stochastic failures to evaluate resilience under uncertainty.
+- **Multi-Objective Pareto Ranking**: Evaluates candidates across trade-off dimensions: Mission Yield, Delta-V Expenditure, Propellant Margins, and Constellation Connectivity.
+- **Transparent Decision Justification**: Generates structured, human-readable mission rationales explaining why the chosen future was selected over lower-ranked alternatives.
+
+### 5. Diagnostics, Intelligence & Fault Injection
+- **Predictive Health Intelligence**: Multi-variate telemetry anomaly scoring evaluating thermal margins, power bus impedance, thruster pressure, and optical SNR.
+- **Probabilistic Diagnostic Drawer**: Bayesian root-cause hypothesis ranking with confidence scores, affected capability matrices, and concrete evidence trails.
+- **Interactive Fault Injection Console**: Direct operator injection of hardware and software faults across any constellation node:
+  - Thruster valve sticking / pressure collapse
+  - Optical transceiver laser diode burnout
+  - Solar array regulator failure / rapid battery drain
+  - OBC epoch desynchronization / Single Event Upset
+  - Byzantine contradictory telemetry broadcasts
+
+### 6. Real-World Mission Context & Earth Observation
+- **NASA EONET & USGS Live Integration**: Automated ingestion of planetary natural hazards (wildfires, earthquakes, severe storms, volcanoes).
+- **Dynamic Swarm Retasking**: Automatic calculation of orbital pass windows, selecting the nearest capable spacecraft and computing multi-hop ISL relay paths to downlink disaster imagery.
 
 ---
 
 ## Complete Technology Stack
 
-| Layer | Technologies & Libraries | Purpose |
+| Architectural Layer | Technologies & Frameworks | Description |
 | :--- | :--- | :--- |
-| **Frontend Framework** | **React 19**, **TypeScript**, **Vite** | Reactive mission control UI, high-performance modular component architecture |
-| **3D Planetary Visualization** | **CesiumJS (1.146+)**, **react-globe.gl** | WGS84 high-precision 3D Earth, ground station masks, day/night terminators, orbital tracks |
-| **Spacecraft 3D CAD Rendering**| **Three.js (0.186+)** | Interactive 3D CubeSat inspection with clickable subsystems (solar arrays, thrusters, EPS, OBC, transceivers) |
-| **Animation & Micro-Interactions** | **GSAP (3.15)**, **Framer Motion (14)** | Fluid timeline transitions, HUD telemetry overlays, modal drawer physics |
-| **Styling & UI Tokens** | **Tailwind CSS v4** | Dark-mode aerospace glassmorphism, responsive telemetry panels, tactical color codings |
-| **Icons & Media** | **Lucide React**, **HLS.js** | Aerospace telemetry iconography and real-time mission video feeds |
-| **Backend & API** | **Python 3.10+**, **FastAPI**, **Uvicorn** | High-throughput REST endpoints and dynamic state orchestrator |
-| **Live Telemetry Stream** | **WebSockets (10 Hz)** | Full-duplex real-time streaming of swarm kinematics, ISL graphs, and consensus frames |
-| **Orbital Mechanics** | **SGP4**, **NumPy**, **SciPy** | Keplerian propagation, high-precision perturbation modeling, coordinate frame transformations |
-| **Network & Swarm Graph** | **NetworkX** | Dynamic line-of-sight graph computation, ISL routing, min-cut partition analysis |
-| **Schema Validation** | **Pydantic v2** | Strict bidirectional data contract enforcement between simulation, autonomy, and frontend |
-| **Autonomous AI / LLM** | **@google/genai (Gemini 2.5/3.0)** | Natural-language mission report explanations and autonomous diagnostic justifications |
+| **Frontend Core** | **React 19**, **TypeScript**, **Vite 8** | Modern reactive UI, strict typing, high-performance modular component architecture |
+| **Planetary Visualization** | **CesiumJS (1.146+)**, **react-globe.gl** | 3D WGS84 Earth globe, orbital ephemeris rendering, ground station cones, day/night terminator |
+| **Spacecraft 3D CAD** | **Three.js (0.186+)** | Modular 3D CubeSat inspection with clickable subsystem meshes and orbital animations |
+| **Motion & Dynamics** | **GSAP (3.15)**, **Framer Motion (14)** | Physics-based drawer animations, timeline scrubbing, and smooth telemetry transitions |
+| **Styling & Design System** | **Tailwind CSS v4** | Dark-mode aerospace glassmorphism, responsive telemetry panels, tactical HUD layout |
+| **Media & Iconography** | **Lucide React**, **HLS.js** | Mission telemetry icons and low-latency live video streaming |
+| **Backend & Orchestrator** | **Python 3.10+**, **FastAPI**, **Uvicorn** | High-throughput async REST API and real-time swarm orchestration engine |
+| **Live Telemetry Engine** | **WebSockets (10 Hz)** | Full-duplex bidirectional streaming of kinematics, ISL network graph, and consensus state |
+| **Orbital Mechanics** | **SGP4**, **NumPy**, **SciPy** | Keplerian propagation, J2 perturbation models, and coordinate transformations |
+| **Graph & Mesh Routing** | **NetworkX** | Dynamic line-of-sight graph computation, ISL routing, and min-cut partition analysis |
+| **Data Contracts & Schemas** | **Pydantic v2** | Bidirectional schema validation enforcing strict contracts across simulation and frontend |
+| **AI Decision Explanation** | **@google/genai (Gemini 2.5/3.0)** | Natural-language mission report synthesis and autonomous diagnostic justification |
+| **Testing & Verification** | **Pytest**, **Pydantic Validation** | Automated scenario validation and contract integrity verification suites |
 
 ---
 
-## The 12-Step Autonomous Resilience Pipeline
+## Autonomous Resilience Pipeline
 
 ```mermaid
 flowchart LR
@@ -109,7 +159,7 @@ flowchart LR
 
 ## Benchmark Scenarios Catalog
 
-ASTRANET includes 10 canonical scenarios in [`backend/scenarios/`](backend/scenarios/) designed for deterministic validation of constellation autonomy:
+ASTRANET includes 10 reproducible benchmark scenarios in [`backend/scenarios/`](backend/scenarios/) designed for deterministic validation of constellation autonomy:
 
 | Scenario ID | Name | Duration | Injected Anomaly | Key Mechanism Tested |
 | :--- | :--- | :--- | :--- | :--- |
@@ -163,7 +213,7 @@ The mission control dashboard will be accessible at **`http://localhost:3000`**.
 ### 3. Backend Setup
 
 ```bash
-# Create and activate a Python virtual environment (recommended)
+# Create and activate a Python virtual environment
 python -m venv venv
 # On Windows:
 venv\Scripts\activate
@@ -224,7 +274,10 @@ Astranet/
 │   │   │   ├── BlackBoxScrubber.tsx   # Mission Black Box timeline flight recorder
 │   │   │   ├── RecoveryTournamentModal.tsx # Pareto strategy ranking visualizer
 │   │   │   ├── DiagnosticDrawer.tsx   # Probabilistic fault attribution
-│   │   │   └── FaultInjectionModal.tsx # Manual fault injection console
+│   │   │   ├── FaultInjectionModal.tsx # Manual fault injection console
+│   │   │   ├── IntelligencePanel.tsx  # Predictive health & TinyML engine
+│   │   │   ├── MissionContextPanel.tsx # Live NASA EONET & USGS disaster retasking
+│   │   │   └── ScenarioSimulationPanel.tsx # Automated scenario benchmark runner
 │   │   └── Hero.tsx, Navbar.tsx   # Platform landing & portfolio sections
 │   ├── hooks/                     # Custom telemetry & WebSocket hooks
 │   └── types/                     # TypeScript shared domain interfaces
